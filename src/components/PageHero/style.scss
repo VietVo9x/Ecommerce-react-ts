@@ -1,0 +1,33 @@
+.page-hero {
+  background-color: #ededed;
+
+  &__center {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    h3 {
+      font-size: 32px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s linear;
+      a {
+        color: var(--text-color);
+        padding: 10px;
+        &:hover {
+          color: var(--primary-color);
+        }
+      }
+    }
+  }
+}
+@media screen and (max-width: 768px) {
+  .page-hero {
+    &__center {
+      h3 {
+        font-size: 24px;
+      }
+    }
+  }
+}
