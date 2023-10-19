@@ -7,7 +7,7 @@
   justify-content: space-between;
   align-items: center;
   &__logo {
-    a {
+    & > a {
       font-size: 32px;
       font-family: 'Young Serif', serif;
       color: var(--text-color);
@@ -131,7 +131,7 @@
     &__logo {
       display: flex;
       justify-content: space-between;
-      button {
+      & > button {
         display: block;
       }
     }

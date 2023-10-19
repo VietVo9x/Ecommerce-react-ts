@@ -29,10 +29,12 @@ export const patchData = async (pathName: string, data: any) => {
 };
 
 //edit toan bo
-export const putData = async (pathName: string, data: any) => {
+export const putData = async (pathName: string, id: any, data: any) => {
   try {
-    const response = await axios.put(api + pathName, data);
+    const response = await axios.put(`${api}${pathName}/${id}`, data);
 
     return response.data;
-  } catch (e) {}
+  } catch (e) {
+    console.log(e);
+  }
 };

@@ -1,6 +1,7 @@
 export interface UserReduxEntity {
   id: string;
   email: string;
+  password: string;
   userName: string;
   fullName: string;
   phone: string;

@@ -1,16 +1,28 @@
+import * as React from 'react';
 import PageHero from '../../../components/PageHero';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import { Button } from '@mui/material';
+import {
+  Button,
+  FormControl,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  OutlinedInput,
+} from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import Typography from '@mui/material/Typography';
-
 import { Link, useNavigate } from 'react-router-dom';
 import { I_LoginError, I_UserLogin } from '../../../types/LoginType';
 import { useState } from 'react';
 import { LoginServices } from './LoginServices';
+import { useDispatch } from 'react-redux';
+import { login } from '../../../redux/slice/AuthSlice';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+
 export default function Login() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const loginServices = new LoginServices();
   const [dataForm, setDataForm] = useState<I_UserLogin>({
     email: '',
@@ -22,6 +34,17 @@ export default function Login() {
     msgEmail: '',
     msgPassword: '',
   });
+
+  // show input pass
+  const [showPassword, setShowPassword] = React.useState(false);
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+  };
+
+  // show input pass
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const retValidator = await loginServices.validator(dataForm);
@@ -32,6 +55,7 @@ export default function Login() {
 
     if (responseLogin.token) {
       localStorage.setItem('token', JSON.stringify(responseLogin.token));
+      dispatch(login(responseLogin));
       navigate('/');
     }
   };
@@ -48,15 +72,25 @@ export default function Login() {
         sx={{
           my: 8,
           mx: 4,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
         }}
       >
-        <Box component="form" noValidate sx={{ mt: 1, width: '400px' }} onSubmit={handleSubmit}>
+        <Box
+          component="form"
+          noValidate
+          sx={{
+            mt: 1,
+            width: '400px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            margin: '0 auto',
+          }}
+          onSubmit={handleSubmit}
+        >
           <Typography component={'h1'} variant="h4" align="center" color={'secondary'} gutterBottom>
             Sign In
           </Typography>
+
           <TextField
             margin="normal"
             required
@@ -93,7 +127,11 @@ export default function Login() {
           </Button>
 
           <Link to="/register">
-            <Typography component={'span'} color={'primary'}>
+            <Typography
+              component={'span'}
+              color={'primary'}
+              sx={{ display: 'block', width: '400px' }}
+            >
               Don't have an account? Sign Up
             </Typography>
           </Link>

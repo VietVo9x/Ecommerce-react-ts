@@ -2,7 +2,6 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import './style.scss';
@@ -11,14 +10,12 @@ import { FaShoppingCart, FaUserPlus, FaBars, FaWindowClose } from 'react-icons/f
 import { links } from '../../routes';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux/es/exports';
-import { I_authState } from '../../redux/slice/AuthSlice';
+import { I_authState, logout } from '../../redux/slice/AuthSlice';
 import { getData, putData } from '../../utils/DB';
 import { UserEntities } from '../../Entities';
 export default function Header() {
   const [showNavMobile, setShowNavMobile] = useState(false);
-  const user = useSelector((state: { auth: I_authState }) => state.auth);
-  const token = useSelector((state: { token: string }) => state.token);
-  console.log(user);
+  const auth = useSelector((state: { auth: I_authState }) => state.auth);
   const dispatch = useDispatch();
   // Mui menu account start
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -32,9 +29,15 @@ export default function Header() {
   // Mui menu account end
 
   const handleLogout = async () => {
+    handleClose();
     const users = await getData('users');
-    const response = users.find((account: UserEntities) => account.token == token);
-    console.log(response);
+    const user = users.find((user: UserEntities) => user.token === auth.user?.token);
+    delete user.token;
+    const deleteToken = await putData('users', user.id, user);
+    if (deleteToken) {
+      localStorage.removeItem('token');
+      dispatch(logout(user));
+    }
   };
 
   return (
@@ -77,7 +80,7 @@ export default function Header() {
                 <span>0</span>
               </span>
             </Link>
-            {user.isLogin ? (
+            {auth.isLogin ? (
               <>
                 <Link
                   to="/account"
@@ -87,7 +90,14 @@ export default function Header() {
                   Account
                   <SettingsOutlinedIcon />
                 </Link>
-                <Link to={''} className="nav__btns--login">
+                <Link
+                  to={'/login'}
+                  className="nav__btns--login"
+                  onClick={() => {
+                    handleLogout();
+                    setShowNavMobile(false);
+                  }}
+                >
                   Logout
                   <ExitToAppIcon />
                 </Link>
@@ -113,7 +123,7 @@ export default function Header() {
               <span>0</span>
             </span>
           </Link>
-          {user.isLogin ? (
+          {auth.isLogin ? (
             <div>
               <Button
                 variant="contained"
@@ -124,7 +134,7 @@ export default function Header() {
                 aria-expanded={open ? 'true' : undefined}
                 onClick={handleClick}
               >
-                {user.user?.userName}
+                {auth.user?.userName}
               </Button>
               <Menu
                 id="basic-menu"
@@ -143,12 +153,7 @@ export default function Header() {
                 <MenuItem onClick={handleClose}>
                   <SettingsOutlinedIcon sx={{ marginRight: '5px' }} /> My account
                 </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    handleClose();
-                    handleLogout();
-                  }}
-                >
+                <MenuItem onClick={handleLogout}>
                   <ExitToAppIcon sx={{ marginRight: '5px' }} />
                   Logout
                 </MenuItem>
