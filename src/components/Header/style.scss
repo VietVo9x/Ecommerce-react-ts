@@ -76,19 +76,20 @@
       display: flex;
       justify-content: center;
       margin-top: 10px;
+      gap: 20px;
     }
   }
 
   &__btns {
     display: flex;
     align-items: center;
-
     &--cart {
       display: flex;
       align-items: center;
       padding: 0 16px;
       font-size: 24px;
       color: var(--text-color);
+      margin-right: 10px;
       &-icon {
         position: relative;
         display: flex;
@@ -117,6 +118,7 @@
       padding: 0 0 0 16px;
       font-size: 24px;
       color: var(--text-color);
+      gap: 5px;
     }
   }
 }

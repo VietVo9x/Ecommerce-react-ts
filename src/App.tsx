@@ -10,8 +10,18 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import ErrorPage from './pages/ErrorPage';
 import SingleProduct from './pages/SingleProduct';
+import Auth from './utils/Auth';
+import { useDispatch } from 'react-redux';
+import { login } from './redux/slice/AuthSlice';
 
 function App() {
+  const dispatch = useDispatch();
+  Auth().then((res) => {
+    if (res) {
+      dispatch(login(res));
+    }
+  });
+
   return (
     <div className="App">
       <Header />
@@ -26,7 +36,6 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
-
       <Footer />
     </div>
   );

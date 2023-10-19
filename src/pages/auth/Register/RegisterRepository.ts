@@ -1,13 +1,14 @@
+import { insertData } from './../../../utils/DB';
 import { I_UserEntity } from '../../../types/EntityType';
-import { getAllItems, insertItem } from '../../../utils/DB.util';
+import { getData } from '../../../utils/DB';
 
 export default class RegisterRepository {
   getAllUser() {
-    const users = getAllItems('accounts'); // trả về array
+    const users = getData('users');
     return users;
   }
-
-  insertUser(entity: I_UserEntity) {
-    return insertItem('accounts', entity); // trả về id
+  insertData(data: I_UserEntity) {
+    const response = insertData('users', data);
+    return response;
   }
 }

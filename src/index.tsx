@@ -6,13 +6,19 @@ import { BrowserRouter } from 'react-router-dom';
 import './assets/css/global.scss';
 import { ThemeProvider } from '@mui/material';
 import { customTheme } from './utils/customTheme';
+import 'react-toastify/dist/ReactToastify.css';
+import { Provider } from 'react-redux';
+import { store } from './redux/store/configureStore';
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <ThemeProvider theme={customTheme}>
-        <App />
-      </ThemeProvider>
+      <Provider store={store}>
+        <ThemeProvider theme={customTheme}>
+          <App />
+        </ThemeProvider>
+      </Provider>
     </BrowserRouter>
   </React.StrictMode>,
 );

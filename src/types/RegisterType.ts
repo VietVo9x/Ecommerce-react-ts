@@ -8,11 +8,12 @@ export interface I_UserRegister {
   address: string;
 }
 export interface I_RegisterError {
-  msgEmail: string | null;
-  msgPhone: string | null;
-  msgUserName: string | null;
-  msgFullName: string | null;
-  msgAddress: string | null;
-  msgPassword: string | null;
-  msgPasswordConfirm: string | null;
+  isError: boolean;
+  msgEmail: string;
+  msgPhone: string;
+  msgUserName: string;
+  msgFullName: string;
+  msgAddress: string;
+  msgPassword: string;
+  msgPasswordConfirm: string;
 }

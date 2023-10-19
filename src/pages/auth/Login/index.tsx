@@ -4,10 +4,43 @@ import TextField from '@mui/material/TextField';
 import { Button } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import Typography from '@mui/material/Typography';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import { Link } from 'react-router-dom';
+
+import { Link, useNavigate } from 'react-router-dom';
+import { I_LoginError, I_UserLogin } from '../../../types/LoginType';
+import { useState } from 'react';
+import { LoginServices } from './LoginServices';
 export default function Login() {
+  const navigate = useNavigate();
+  const loginServices = new LoginServices();
+  const [dataForm, setDataForm] = useState<I_UserLogin>({
+    email: '',
+    password: '',
+    isChecked: false,
+  });
+  const [error, setError] = useState<I_LoginError>({
+    isError: false,
+    msgEmail: '',
+    msgPassword: '',
+  });
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const retValidator = await loginServices.validator(dataForm);
+    if (retValidator.isError) {
+      return setError(retValidator);
+    }
+    const responseLogin = await loginServices.onLogin(dataForm);
+
+    if (responseLogin.token) {
+      localStorage.setItem('token', JSON.stringify(responseLogin.token));
+      navigate('/');
+    }
+  };
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const name = event.target.name;
+    const value = event.target.value;
+    setDataForm((prev) => ({ ...prev, [name]: value }));
+  };
+
   return (
     <div>
       <PageHero title="Sign In" />
@@ -20,23 +53,41 @@ export default function Login() {
           alignItems: 'center',
         }}
       >
-        <Box component="form" noValidate sx={{ mt: 1, width: '400px' }}>
-          <Typography component={'h1'} variant="h4" align="center" color={'primary'} gutterBottom>
+        <Box component="form" noValidate sx={{ mt: 1, width: '400px' }} onSubmit={handleSubmit}>
+          <Typography component={'h1'} variant="h4" align="center" color={'secondary'} gutterBottom>
             Sign In
           </Typography>
-          <TextField margin="normal" required id="outlined-required" label="User Name" fullWidth />
-          <TextField margin="normal" required id="outlined-required" label="Password" fullWidth />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-            labelPlacement="start"
+          <TextField
+            margin="normal"
+            required
+            id="email"
+            label="Email"
+            name="email"
+            fullWidth
+            onChange={handleChange}
+            error={error.isError && error.msgEmail.length > 0}
+            helperText={error.msgEmail}
           />
+          <TextField
+            margin="normal"
+            required
+            id="password"
+            type="password"
+            label="Password"
+            name="password"
+            fullWidth
+            onChange={handleChange}
+            error={error.isError && error.msgPassword.length > 0}
+            helperText={error.msgPassword}
+          />
+
           <Button
             variant="contained"
             type="submit"
             startIcon={<SendIcon />}
             fullWidth
             sx={{ mt: 3, mb: 2 }}
+            color="secondary"
           >
             Sign In
           </Button>

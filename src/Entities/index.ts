@@ -1,4 +1,4 @@
-export interface I_UserEntity {
+export interface UserEntities {
   id: string;
   email: string;
   password: string;
@@ -6,9 +6,9 @@ export interface I_UserEntity {
   fullName: string;
   phone: string;
   address: string;
-  cart: any[];
   role: false;
   status: true;
   created_at: string;
   update_at: string;
+  token?: string;
 }

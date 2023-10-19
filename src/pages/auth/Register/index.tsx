@@ -4,14 +4,15 @@ import TextField from '@mui/material/TextField';
 import { Button } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import Typography from '@mui/material/Typography';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import './style.scss';
 import { I_RegisterError, I_UserRegister } from '../../../types/RegisterType';
-import RegisterEvent from './RegisterEvent';
-import axios from 'axios';
+import RegisterServices from './RegisterServices';
+
 export default function Register() {
-  const registerEvent = new RegisterEvent();
+  const navigate = useNavigate();
+  const registerServices = new RegisterServices();
   const [dataForm, setFormData] = useState<I_UserRegister>({
     password: '',
     email: '',
@@ -22,40 +23,36 @@ export default function Register() {
     address: '',
   });
   const [error, setError] = useState<I_RegisterError>({
-    msgEmail: null,
-    msgPhone: null,
-    msgUserName: null,
-    msgFullName: null,
-    msgAddress: null,
-    msgPassword: null,
-    msgPasswordConfirm: null,
+    isError: false,
+    msgEmail: '',
+    msgPhone: '',
+    msgUserName: '',
+    msgFullName: '',
+    msgAddress: '',
+    msgPassword: '',
+    msgPasswordConfirm: '',
   });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
     const value = event.target.value;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev: I_UserRegister) => ({ ...prev, [name]: value }));
   };
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // const data = {
-    //   email: dataForm.email,
-    //   password: dataForm.password,
-    // };
-    // axios
-    //   .post('http://localhost:3004/users', data)
-    //   .then((response) => {
-    //     console.log(response);
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
 
-    const response = registerEvent.onRegister(dataForm);
-    if (response?.isError) {
-      setError({ ...response.msgError });
+    const responseValidate = await registerServices.validator(dataForm);
+    setError({ ...responseValidate });
+
+    if (responseValidate.isError) {
+      return;
     }
-    console.log(error);
+
+    const registerResponse = await registerServices.register(dataForm);
+    console.log(registerResponse);
+    if (registerResponse) {
+      navigate('/login');
+    }
   };
 
   return (
@@ -71,7 +68,7 @@ export default function Register() {
         }}
       >
         <Box component="form" noValidate sx={{ mt: 1, width: '400px' }} onSubmit={handleSubmit}>
-          <Typography component={'h1'} variant="h4" align="center" color={'primary'} gutterBottom>
+          <Typography component={'h1'} variant="h4" align="center" color={'secondary'} gutterBottom>
             Sign Up
           </Typography>
           <TextField
@@ -82,7 +79,7 @@ export default function Register() {
             label="User Name"
             fullWidth
             onChange={handleChange}
-            error={!!error.msgUserName}
+            error={error.isError && error.msgUserName.length > 0}
             helperText={error.msgUserName}
           />
           <TextField
@@ -94,7 +91,7 @@ export default function Register() {
             name="email"
             fullWidth
             onChange={handleChange}
-            error={!!error.msgEmail}
+            error={error.isError && error.msgEmail.length > 0}
             helperText={error.msgEmail}
           />
           <TextField
@@ -105,7 +102,7 @@ export default function Register() {
             name="fullName"
             fullWidth
             onChange={handleChange}
-            error={!!error.msgFullName}
+            error={error.isError && error.msgFullName.length > 0}
             helperText={error.msgFullName}
           />
           <TextField
@@ -117,7 +114,7 @@ export default function Register() {
             name="password"
             fullWidth
             onChange={handleChange}
-            error={!!error.msgPassword}
+            error={error.isError && error.msgPassword.length > 0}
             helperText={error.msgPassword}
           />
           <TextField
@@ -129,7 +126,7 @@ export default function Register() {
             name="repeatPassword"
             fullWidth
             onChange={handleChange}
-            error={!!error.msgPasswordConfirm}
+            error={error.isError && error.msgPasswordConfirm.length > 0}
             helperText={error.msgPasswordConfirm}
           />
           <TextField
@@ -140,7 +137,7 @@ export default function Register() {
             name="phone"
             fullWidth
             onChange={handleChange}
-            error={!!error.msgPhone}
+            error={error.isError && error.msgPhone.length > 0}
             helperText={error.msgPhone}
           />
           <TextField
@@ -151,7 +148,7 @@ export default function Register() {
             name="address"
             fullWidth
             onChange={handleChange}
-            error={!!error.msgAddress}
+            error={error.isError && error.msgAddress.length > 0}
             helperText={error.msgAddress}
           />
 
@@ -161,6 +158,7 @@ export default function Register() {
             startIcon={<SendIcon />}
             fullWidth
             sx={{ mt: 3, mb: 2 }}
+            color={'secondary'}
           >
             Sign Up
           </Button>
