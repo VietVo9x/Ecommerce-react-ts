@@ -35,16 +35,6 @@ export default function Login() {
     msgPassword: '',
   });
 
-  // show input pass
-  const [showPassword, setShowPassword] = React.useState(false);
-
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-
-  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-  };
-
-  // show input pass
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const retValidator = await loginServices.validator(dataForm);
@@ -52,9 +42,12 @@ export default function Login() {
       return setError(retValidator);
     }
     const responseLogin = await loginServices.onLogin(dataForm);
-
-    if (responseLogin.token) {
-      localStorage.setItem('token', JSON.stringify(responseLogin.token));
+    if (responseLogin) {
+      const userLogin = {
+        id: responseLogin.id,
+        userName: responseLogin.userName,
+      };
+      localStorage.setItem('userLogin', JSON.stringify(userLogin));
       dispatch(login(responseLogin));
       navigate('/');
     }

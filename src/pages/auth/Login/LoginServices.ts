@@ -14,8 +14,7 @@ export class LoginServices {
       }
     });
     if (user) {
-      user.token = user.id;
-      const login = await loginRepository.updateUser(user);
+      const login = await loginRepository.updateUser(user, user.id);
       return login;
     }
   }

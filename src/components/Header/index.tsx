@@ -11,8 +11,6 @@ import { links } from '../../routes';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux/es/exports';
 import { I_authState, logout } from '../../redux/slice/AuthSlice';
-import { getData, putData } from '../../utils/DB';
-import { UserEntities } from '../../Entities';
 export default function Header() {
   const [showNavMobile, setShowNavMobile] = useState(false);
   const auth = useSelector((state: { auth: I_authState }) => state.auth);
@@ -30,14 +28,8 @@ export default function Header() {
 
   const handleLogout = async () => {
     handleClose();
-    const users = await getData('users');
-    const user = users.find((user: UserEntities) => user.token === auth.user?.token);
-    delete user.token;
-    const deleteToken = await putData('users', user.id, user);
-    if (deleteToken) {
-      localStorage.removeItem('token');
-      dispatch(logout(user));
-    }
+    localStorage.removeItem('userLogin');
+    dispatch(logout());
   };
 
   return (
@@ -134,7 +126,7 @@ export default function Header() {
                 aria-expanded={open ? 'true' : undefined}
                 onClick={handleClick}
               >
-                {auth.user?.userName}
+                Hello ,{auth.user?.userName}
               </Button>
               <Menu
                 id="basic-menu"

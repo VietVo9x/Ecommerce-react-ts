@@ -49,7 +49,6 @@ export default function Register() {
     }
 
     const registerResponse = await registerServices.register(dataForm);
-    console.log(registerResponse);
     if (registerResponse) {
       navigate('/login');
     }

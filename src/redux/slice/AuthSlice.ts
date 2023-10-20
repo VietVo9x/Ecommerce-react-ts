@@ -1,10 +1,11 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { UserReduxEntity } from '../../models/login.response';
-import { UserEntities } from '../../Entities';
-
+export interface I_userLoginRedux {
+  id: string;
+  userName: string;
+}
 export interface I_authState {
   isLogin: boolean;
-  user: null | UserReduxEntity;
+  user: null | I_userLoginRedux;
 }
 const initialState = {
   isLogin: false,
@@ -14,12 +15,12 @@ const authSlice = createSlice({
   name: 'auth',
   initialState: initialState,
   reducers: {
-    login: (state: I_authState, action: PayloadAction) => {
-      state.user = action.payload as unknown as UserReduxEntity;
+    login: (state: I_authState, action: PayloadAction<I_userLoginRedux>) => {
+      state.user = action.payload;
       state.isLogin = true;
     },
     logout: (state: I_authState, action: PayloadAction) => {
-      state.user = action.payload as unknown as UserEntities;
+      state.user = null;
       state.isLogin = false;
     },
   },

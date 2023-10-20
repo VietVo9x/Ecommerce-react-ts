@@ -1,3 +1,5 @@
+import { I_productUser } from './ProductsType';
+
 export interface I_UserEntity {
   id: string;
   email: string;
@@ -6,7 +8,7 @@ export interface I_UserEntity {
   fullName: string;
   phone: string;
   address: string;
-  cart: any[];
+  cart: I_productUser[];
   role: false;
   status: true;
   created_at: string;

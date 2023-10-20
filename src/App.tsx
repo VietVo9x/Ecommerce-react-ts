@@ -13,6 +13,9 @@ import SingleProduct from './pages/SingleProduct';
 import Auth from './utils/Auth';
 import { useDispatch } from 'react-redux';
 import { login } from './redux/slice/AuthSlice';
+import { useEffect } from 'react';
+import { getData } from './utils/DB';
+import { getProducts } from './redux/slice/ProductStore';
 
 function App() {
   const dispatch = useDispatch();
@@ -21,7 +24,11 @@ function App() {
       dispatch(login(res));
     }
   });
-
+  useEffect(() => {
+    getData('products').then((res) => {
+      dispatch(getProducts(res));
+    });
+  }, []);
   return (
     <div className="App">
       <Header />

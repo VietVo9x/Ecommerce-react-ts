@@ -17,15 +17,35 @@ import Box from '@mui/material/Box';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import FormLabel from '@mui/material/FormLabel';
+
 import './style.scss';
+import { useEffect, useState } from 'react';
+import { I_product } from '../../types/ProductsType';
+import { getData } from '../../utils/DB';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 export default function Products() {
-  const [page, setPage] = React.useState(1);
-  const handleChangeStack = (event: React.ChangeEvent<unknown>, value: number) => {
+  const [products, setProducts] = useState<I_product[]>([]); // products da ta
+  const [page, setPage] = React.useState(1); // paragation
+  const allProducts = useSelector(
+    (state: {
+      products: {
+        data: I_product[];
+      };
+    }) => state.products.data,
+  );
+
+  //mui
+  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
   };
   const [age, setAge] = React.useState('');
   const [value, setValue] = React.useState('');
+
+  //data products
+  useEffect(() => {
+    getData('products').then((res) => setProducts(res));
+  }, []);
 
   const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue((event.target as HTMLInputElement).value);
@@ -35,6 +55,13 @@ export default function Products() {
     setAge(event.target.value as string);
   };
 
+  //filter
+
+  //handle view
+  const navigate = useNavigate();
+  const handleView = (id: string) => {
+    navigate('/products/' + id);
+  };
   return (
     <div>
       <PageHero title="Products" />
@@ -54,11 +81,11 @@ export default function Products() {
               value={value}
               onChange={handleRadioChange}
             >
-              <FormControlLabel value="1" control={<Radio />} label="All" />
-              <FormControlLabel value="2" control={<Radio />} label="PC Gaming" />
-              <FormControlLabel value="3" control={<Radio />} label="Laptop" />
-              <FormControlLabel value="4" control={<Radio />} label="Accessories" />
-              <FormControlLabel value="5" control={<Radio />} label="Gaming Gear" />
+              <FormControlLabel value="All" control={<Radio />} label="All" />
+              <FormControlLabel value="PC" control={<Radio />} label="PC " />
+              <FormControlLabel value="Laptop" control={<Radio />} label="Laptop" />
+              <FormControlLabel value="Accessories" control={<Radio />} label="Accessories" />
+              <FormControlLabel value="Gaming Gear" control={<Radio />} label="Gaming Gear" />
             </RadioGroup>
           </FormGroup>
         </div>
@@ -80,97 +107,39 @@ export default function Products() {
               </Select>
             </FormControl>
           </Box>
+
           <div className="products--content">
-            <div className="products--content__item">
-              <div className="products--content__item--image">
-                <img
-                  src="https://mega.com.vn/media/product/250_21883_may_bo_hp_205_pro_g4_aio_31y21pa_den_5.jpg"
-                  alt=""
-                />
-              </div>
-              <h5 className="products--content__item--title">Màn Hình Máy Tính</h5>
-              <div className="products--content__item--price">
-                <p>100.00$</p>
-                <sub>120.00$</sub>
-              </div>
-              <div className="products--content__item--action">
-                <Tooltip title=" View" placement="top">
-                  <Button color="inherit">
-                    {' '}
-                    <RemoveRedEyeOutlinedIcon />
-                  </Button>
-                </Tooltip>
+            {products &&
+              products.map((product) => (
+                <div className="products--content__item" key={product.id}>
+                  <div className="products--content__item--image">
+                    <img src={product.image} alt="" />
+                  </div>
+                  <h5 className="products--content__item--title">{product.product_name}</h5>
+                  <div className="products--content__item--price">
+                    <p>{product.unit_price}$</p>
+                  </div>
+                  <div className="products--content__item--action">
+                    <Tooltip title=" View" placement="top">
+                      <Button color="inherit" onClick={() => handleView(product.id)}>
+                        {' '}
+                        <RemoveRedEyeOutlinedIcon />
+                      </Button>
+                    </Tooltip>
 
-                <Tooltip title=" Add to cart" placement="top">
-                  <Button color="inherit">
-                    {' '}
-                    <ShoppingCartOutlinedIcon />
-                  </Button>
-                </Tooltip>
-              </div>
-            </div>
-            <div className="products--content__item">
-              <div className="products--content__item--image">
-                <img
-                  src="https://mega.com.vn/media/product/250_22524_loa_bluetooth_jbl_flip_6_blk.jpg"
-                  alt=""
-                />
-              </div>
-              <h5 className="products--content__item--title">Loa Mini</h5>
-              <div className="products--content__item--price">
-                <p>150.00$</p>
-                <sub>180.00$</sub>
-              </div>
-              <div className="products--content__item--action">
-                <Tooltip title=" View" placement="top">
-                  <Button color="inherit">
-                    {' '}
-                    <RemoveRedEyeOutlinedIcon />
-                  </Button>
-                </Tooltip>
-
-                <Tooltip title=" Add to cart" placement="top">
-                  <Button color="inherit">
-                    {' '}
-                    <ShoppingCartOutlinedIcon />
-                  </Button>
-                </Tooltip>
-              </div>
-            </div>
-            <div className="products--content__item">
-              <div className="products--content__item--image">
-                <img
-                  src="https://mega.com.vn/media/product/250_24398_tan_nhiet_khi_cooler_master_hyper_620s_argb.jpg"
-                  alt=""
-                />
-              </div>
-              <h5 className="products--content__item--title">Quạt tản nhiệt</h5>
-              <div className="products--content__item--price">
-                <p>50.00$</p>
-                <sub>57.00$</sub>
-              </div>
-              <div className="products--content__item--action">
-                <Tooltip title=" View" placement="top">
-                  <Button color="inherit">
-                    {' '}
-                    <RemoveRedEyeOutlinedIcon />
-                  </Button>
-                </Tooltip>
-
-                <Tooltip title=" Add to cart" placement="top">
-                  <Button color="inherit">
-                    {' '}
-                    <ShoppingCartOutlinedIcon />
-                  </Button>
-                </Tooltip>
-              </div>
-            </div>
+                    <Tooltip title=" Add to cart" placement="top">
+                      <Button color="inherit">
+                        {' '}
+                        <ShoppingCartOutlinedIcon />
+                      </Button>
+                    </Tooltip>
+                  </div>
+                </div>
+              ))}
           </div>
-          
           {/* phan trang */}
           <Stack spacing={2} mt={2}>
-            <Typography>Page: {page}</Typography>
-            <Pagination count={10} page={page} onChange={handleChangeStack} />
+            <Pagination count={10} page={page} onChange={handleChange} />
           </Stack>
         </div>
       </div>

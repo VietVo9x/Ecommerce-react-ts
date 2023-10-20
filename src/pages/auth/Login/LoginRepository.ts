@@ -1,5 +1,5 @@
 import { UserEntities } from '../../../Entities';
-import { getData, insertData, patchData } from '../../../utils/DB';
+import { getData, patchData } from '../../../utils/DB';
 
 export class LoginRepository {
   getAllUser() {
@@ -7,8 +7,8 @@ export class LoginRepository {
     return users;
   }
   //them moi
-  updateUser(data: UserEntities) {
-    const response = patchData('users/' + data.id, data);
+  updateUser(data: UserEntities, id: string) {
+    const response = patchData('users/', id, data);
     return response;
   }
 }
