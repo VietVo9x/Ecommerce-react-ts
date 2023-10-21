@@ -19,7 +19,11 @@ export default function SingleProduct() {
   const [value, setValue] = React.useState<number | null>(2);
   const [quantityInput, setQuantityInput] = useState(1);
 
-  const user = useSelector((state: RootState) => state.auth);
+  const auth: {
+    isLogin: boolean;
+    user: any;
+  } = useSelector((state: RootState) => state.auth);
+
   const products = useSelector((state: { products: { data: I_product[] } }) => state.products.data); //products trong redux
   const param = useParams();
   const navigate = useNavigate();
@@ -41,7 +45,7 @@ export default function SingleProduct() {
     }
   };
   const handleAddToCart = async () => {
-    if (!user.isLogin) {
+    if (!auth.isLogin) {
       toast.error('You need to be logged in to make a purchase.', { autoClose: 1000 });
       setTimeout(() => {
         navigate('/login');
@@ -49,6 +53,7 @@ export default function SingleProduct() {
     }
     const response = await singleProductServices.addProductToCart(product, quantityInput);
     if (response) {
+      console.log(response);
       singleProductRepository.getAllProduct().then((res) => {
         dispatch(getProducts(res));
       });

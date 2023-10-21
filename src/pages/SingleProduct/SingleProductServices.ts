@@ -33,25 +33,25 @@ export class SingleProductServices {
         // da co san pham do trong cart
         productCart.quantity = productCart.quantity + qtyInput;
         const updateUserCart = await singleProductRepository.updateCartUser(userDB.id, userDB);
-        const downQty = product.stock_quantity - qtyInput;
-        const newProductDB = { ...product, stock_quantity: downQty };
-        const updateProductDB = await singleProductRepository.updateProductDB(
-          product.id,
-          newProductDB,
-        );
-        return updateProductDB;
+        // const downQty = product.stock_quantity - qtyInput;
+        // const newProductDB = { ...product, stock_quantity: downQty };
+        // const updateProductDB = await singleProductRepository.updateProductDB(
+        //   product.id,
+        //   newProductDB,
+        // );
+        return updateUserCart;
       } else {
         //neu chua co san pham do trong cart
         userDB.cart.push(newProduct);
         const updateUserCart = await singleProductRepository.updateCartUser(userDB.id, userDB);
         //giam instock_quantity product trong store
-        const downQty = product.stock_quantity - 1;
-        const newProductDB = { ...product, stock_quantity: downQty };
-        const updateProductDB = await singleProductRepository.updateProductDB(
-          product.id,
-          newProductDB,
-        );
-        return updateProductDB;
+        // const downQty = product.stock_quantity - 1;
+        // const newProductDB = { ...product, stock_quantity: downQty };
+        // const updateProductDB = await singleProductRepository.updateProductDB(
+        //   product.id,
+        //   newProductDB,
+        // );
+        return updateUserCart;
       }
     }
   }

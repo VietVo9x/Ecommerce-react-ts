@@ -28,38 +28,27 @@ import { perPage } from '../../utils/constant';
 export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [count, setCount] = useState(0);
-  const pagessss = Number(searchParams.get('page'));
-  const cate = Number(searchParams.get('cate'));
-  const query = {
-    page: 1,
-  };
-  console.log('palsldalsdl', pagessss, cate);
-  const [products, setProducts] = useState<I_product[]>([]); // products da ta
+  const page = Number(searchParams.get('page'));
+  const cate = searchParams.get('category');
+  const search = searchParams.get('search');
 
-  const allProducts = useSelector(
-    (state: {
-      products: {
-        data: I_product[];
-      };
-    }) => state.products.data,
-  );
+  const [products, setProducts] = useState<I_product[]>([]); // products da ta
 
   //mui
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    console.log(value);
     setSearchParams({ page: value.toString() });
   };
 
   const [age, setAge] = React.useState('');
-  const [value, setValue] = React.useState('');
+  const [value, setValue] = React.useState('All');
 
   //data products
   useEffect(() => {
-    getDataFilter(`products?_page=${pagessss}&_limit=5`).then((res) => {
+    getDataFilter(`products?_page=${page}&_limit=6`).then((res) => {
       setProducts(res?.data);
       setCount(Math.ceil(res?.headers['x-total-count'] / perPage));
     });
-  }, [pagessss]);
+  }, [page]);
 
   const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue((event.target as HTMLInputElement).value);
@@ -153,7 +142,7 @@ export default function Products() {
           </div>
           {/* phan trang */}
           <Stack spacing={2} mt={2}>
-            <Pagination count={count} page={pagessss} onChange={handleChange} />
+            <Pagination count={count} page={page || 1} onChange={handleChange} />
           </Stack>
         </div>
       </div>

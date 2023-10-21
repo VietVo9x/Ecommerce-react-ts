@@ -12,7 +12,6 @@ export const getData = async (pathName: string) => {
 export const getDataFilter = async (pathName: string) => {
   try {
     const response = await axios.get(api + pathName);
-    console.log(response.headers['x-total-count']);
     return response;
   } catch (e) {}
 };
