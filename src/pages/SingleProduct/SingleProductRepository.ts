@@ -1,5 +1,5 @@
 import { ProductEntities, UserEntities } from './../../Entities/index';
-import { getData, patchData } from '../../utils/DB';
+import { getData, patchData, putData } from '../../utils/DB';
 
 export class SingleProductRepository {
   getAllUsers() {
@@ -14,8 +14,8 @@ export class SingleProductRepository {
     const responseUpdateCart = patchData('users', id, user);
     return responseUpdateCart;
   }
-  updateProductsDB(id: string, product: ProductEntities) {
-    const responseUpdateProductDB = patchData('products', id, product);
+  updateProductDB(id: string, product: ProductEntities) {
+    const responseUpdateProductDB = putData('products', id, product);
     return responseUpdateProductDB;
   }
 }

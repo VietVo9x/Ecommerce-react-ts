@@ -48,7 +48,7 @@ export default function Login() {
         userName: responseLogin.userName,
       };
       localStorage.setItem('userLogin', JSON.stringify(userLogin));
-      dispatch(login(responseLogin));
+      dispatch(login(userLogin));
       navigate('/');
     }
   };

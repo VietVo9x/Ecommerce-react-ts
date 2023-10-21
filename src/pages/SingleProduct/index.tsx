@@ -4,28 +4,31 @@ import Typography from '@mui/material/Typography';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import './style.scss';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { I_product, I_productUser } from '../../types/ProductsType';
 import { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import { SingleProductRepository } from './SingleProductRepository';
-import { I_userLoginRedux } from '../../redux/slice/AuthSlice';
-import { UserEntities } from '../../Entities';
 import { SingleProductServices } from './SingleProductServices';
 import { RootState } from '../../redux/store/configureStore';
+import { getProducts } from '../../redux/slice/ProductStore';
 
 export default function SingleProduct() {
   const [value, setValue] = React.useState<number | null>(2);
   const [quantityInput, setQuantityInput] = useState(1);
+
   const user = useSelector((state: RootState) => state.auth);
-  console.log(user);
   const products = useSelector((state: { products: { data: I_product[] } }) => state.products.data); //products trong redux
   const param = useParams();
   const navigate = useNavigate();
-  const product = products.find((product: I_product) => product.id === param.id); //check product voi id tren url
+  const dispatch = useDispatch();
+  const product = products.find((product: I_product) => product.id == param.id); //check product voi id tren url
+  console.log('thong tin san pham', product);
   const singleProductServices = new SingleProductServices();
+  const singleProductRepository = new SingleProductRepository();
+
   if (!product) {
-    navigate('*');
+    navigate('/products');
     return <></>;
   }
 
@@ -43,7 +46,12 @@ export default function SingleProduct() {
         navigate('/login');
       }, 2000);
     }
-    singleProductServices.addProductToCart(product);
+    const response = await singleProductServices.addProductToCart(product, quantityInput);
+    if (response) {
+      singleProductRepository.getAllProduct().then((res) => {
+        dispatch(getProducts(res));
+      });
+    }
   };
   return (
     <>
