@@ -1,6 +1,5 @@
 import { I_product, I_productUser } from '../../types/ProductsType';
 import { SingleProductRepository } from './SingleProductRepository';
-import { getProducts } from '../../redux/slice/ProductStore';
 import { UserEntities } from '../../Entities';
 
 const userLocal = localStorage.getItem('userLogin');
@@ -27,7 +26,6 @@ export class SingleProductServices {
       const userLogin = JSON.parse(userLocal);
       const users = await singleProductRepository.getAllUsers();
       const userDB = users.find((user: UserEntities) => user.id === userLogin.id);
-      console.log('thong tin user', userDB);
       const productCart = userDB.cart.find(
         (productCart: I_productUser) => productCart.product_name === product.product_name,
       );

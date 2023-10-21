@@ -1,14 +1,14 @@
-import { UserEntities } from '../../../Entities';
-import { getData, patchData } from '../../../utils/DB';
+import { getData, getDataForID } from '../../../utils/DB';
 
 export class LoginRepository {
+  //get all
   getAllUser() {
     const users = getData('users');
     return users;
   }
-  //them moi
-  updateUser(data: UserEntities, id: string) {
-    const response = patchData('users/', id, data);
+  //login
+  postUser(id: string) {
+    const response = getDataForID('users', id);
     return response;
   }
 }

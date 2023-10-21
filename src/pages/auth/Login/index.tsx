@@ -2,14 +2,7 @@ import * as React from 'react';
 import PageHero from '../../../components/PageHero';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import {
-  Button,
-  FormControl,
-  IconButton,
-  InputAdornment,
-  InputLabel,
-  OutlinedInput,
-} from '@mui/material';
+import { Button } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import Typography from '@mui/material/Typography';
 import { Link, useNavigate } from 'react-router-dom';
@@ -18,7 +11,6 @@ import { useState } from 'react';
 import { LoginServices } from './LoginServices';
 import { useDispatch } from 'react-redux';
 import { login } from '../../../redux/slice/AuthSlice';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -43,12 +35,9 @@ export default function Login() {
     }
     const responseLogin = await loginServices.onLogin(dataForm);
     if (responseLogin) {
-      const userLogin = {
-        id: responseLogin.id,
-        userName: responseLogin.userName,
-      };
-      localStorage.setItem('userLogin', JSON.stringify(userLogin));
-      dispatch(login(userLogin));
+      delete responseLogin.password;
+      localStorage.setItem('userLogin', JSON.stringify(responseLogin));
+      dispatch(login(responseLogin));
       navigate('/');
     }
   };

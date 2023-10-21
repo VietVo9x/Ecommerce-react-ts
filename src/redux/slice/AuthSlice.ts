@@ -1,26 +1,23 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-export interface I_userLoginRedux {
-  id: string;
-  userName: string;
-}
+import { UserReduxEntity } from '../../types/login.response';
 export interface I_authState {
   isLogin: boolean;
-  user: null | I_userLoginRedux;
+  user: undefined | UserReduxEntity;
 }
 const initialState = {
   isLogin: false,
-  user: null,
+  user: undefined,
 };
 const authSlice = createSlice({
   name: 'auth',
   initialState: initialState,
   reducers: {
-    login: (state: I_authState, action: PayloadAction<I_userLoginRedux>) => {
+    login: (state: I_authState, action: PayloadAction<UserReduxEntity>) => {
       state.user = action.payload;
       state.isLogin = true;
     },
     logout: (state: I_authState, action: PayloadAction) => {
-      state.user = null;
+      state.user = undefined;
       state.isLogin = false;
     },
   },

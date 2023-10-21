@@ -15,7 +15,7 @@ export class SingleProductRepository {
     return responseUpdateCart;
   }
   updateProductDB(id: string, product: ProductEntities) {
-    const responseUpdateProductDB = putData('products', id, product);
+    const responseUpdateProductDB = patchData('products', id, product);
     return responseUpdateProductDB;
   }
 }

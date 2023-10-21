@@ -21,12 +21,21 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import './style.scss';
 import { useEffect, useState } from 'react';
 import { I_product } from '../../types/ProductsType';
-import { getData } from '../../utils/DB';
+import { getDataFilter } from '../../utils/DB';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { perPage } from '../../utils/constant';
 export default function Products() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [count, setCount] = useState(0);
+  const pagessss = Number(searchParams.get('page'));
+  const cate = Number(searchParams.get('cate'));
+  const query = {
+    page: 1,
+  };
+  console.log('palsldalsdl', pagessss, cate);
   const [products, setProducts] = useState<I_product[]>([]); // products da ta
-  const [page, setPage] = React.useState(1); // paragation
+
   const allProducts = useSelector(
     (state: {
       products: {
@@ -37,15 +46,20 @@ export default function Products() {
 
   //mui
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    setPage(value);
+    console.log(value);
+    setSearchParams({ page: value.toString() });
   };
+
   const [age, setAge] = React.useState('');
   const [value, setValue] = React.useState('');
 
   //data products
   useEffect(() => {
-    getData('products').then((res) => setProducts(res));
-  }, []);
+    getDataFilter(`products?_page=${pagessss}&_limit=5`).then((res) => {
+      setProducts(res?.data);
+      setCount(Math.ceil(res?.headers['x-total-count'] / perPage));
+    });
+  }, [pagessss]);
 
   const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue((event.target as HTMLInputElement).value);
@@ -139,7 +153,7 @@ export default function Products() {
           </div>
           {/* phan trang */}
           <Stack spacing={2} mt={2}>
-            <Pagination count={10} page={page} onChange={handleChange} />
+            <Pagination count={count} page={pagessss} onChange={handleChange} />
           </Stack>
         </div>
       </div>

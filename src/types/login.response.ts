@@ -1,7 +1,7 @@
 import { I_productUser } from './ProductsType';
 
 export interface UserReduxEntity {
-  id: string;
+  id?: string;
   email: string;
   password: string;
   userName: string;

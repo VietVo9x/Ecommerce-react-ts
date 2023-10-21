@@ -1,0 +1,26 @@
+.cart {
+  width: 1200px;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 60px 10px;
+  &__table {
+    width: 100%;
+    border: 1px solid #ccc;
+    th {
+      border-bottom: 1px solid #ccc;
+    }
+    td {
+      text-align: center;
+      & > img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+      }
+    }
+  }
+}
+table,
+th,
+td {
+  padding: 15px;
+}

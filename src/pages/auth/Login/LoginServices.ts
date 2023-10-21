@@ -14,7 +14,8 @@ export class LoginServices {
       }
     });
     if (user) {
-      const login = await loginRepository.updateUser(user, user.id);
+      const login = await loginRepository.postUser(user.id);
+
       return login;
     }
   }

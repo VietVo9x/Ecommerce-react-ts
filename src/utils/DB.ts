@@ -2,16 +2,25 @@ import axios from 'axios';
 import { api } from '../apis';
 
 //get data
-export const getData = async (
-  pathName: string,
-  conditions: { key: string; value: string }[] = [],
-) => {
+export const getData = async (pathName: string) => {
   try {
-    const conditionString = conditions
-      .map((condition) => condition.key + '=' + condition.value)
-      .join('&');
-    const response = await axios.get(api + pathName + '?' + conditionString);
+    const response = await axios.get(api + pathName);
+    return response.data;
+  } catch (e) {}
+};
+//get list data
+export const getDataFilter = async (pathName: string) => {
+  try {
+    const response = await axios.get(api + pathName);
+    console.log(response.headers['x-total-count']);
+    return response;
+  } catch (e) {}
+};
 
+//get data kem id
+export const getDataForID = async (pathName: string, id: string) => {
+  try {
+    const response = await axios.get(`${api}${pathName}/${id}`);
     return response.data;
   } catch (e) {}
 };
@@ -20,7 +29,6 @@ export const getData = async (
 export const insertData = async (pathName: string, data: any) => {
   try {
     const response = await axios.post(api + pathName, data);
-
     return response.data;
   } catch (e) {}
 };

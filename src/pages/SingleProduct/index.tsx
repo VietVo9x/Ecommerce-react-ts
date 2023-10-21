@@ -12,6 +12,8 @@ import { SingleProductRepository } from './SingleProductRepository';
 import { SingleProductServices } from './SingleProductServices';
 import { RootState } from '../../redux/store/configureStore';
 import { getProducts } from '../../redux/slice/ProductStore';
+import { login } from '../../redux/slice/AuthSlice';
+import Auth from '../../utils/Auth';
 
 export default function SingleProduct() {
   const [value, setValue] = React.useState<number | null>(2);
@@ -23,7 +25,6 @@ export default function SingleProduct() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const product = products.find((product: I_product) => product.id == param.id); //check product voi id tren url
-  console.log('thong tin san pham', product);
   const singleProductServices = new SingleProductServices();
   const singleProductRepository = new SingleProductRepository();
 
@@ -50,6 +51,12 @@ export default function SingleProduct() {
     if (response) {
       singleProductRepository.getAllProduct().then((res) => {
         dispatch(getProducts(res));
+      });
+      toast.success(`Successfully added ${quantityInput} items.`, { autoClose: 1000 });
+      Auth().then((res) => {
+        if (res) {
+          dispatch(login(res));
+        }
       });
     }
   };
@@ -103,10 +110,12 @@ export default function SingleProduct() {
               <button onClick={() => handleQuantity('down')} disabled={quantityInput === 1}>
                 -
               </button>
-              <input type="text" value={quantityInput} />
+              {quantityInput && <input type="text" value={quantityInput} readOnly />}
               <button onClick={() => handleQuantity('up')}>+</button>
             </div>
-            <button onClick={handleAddToCart}> ADD TO CART</button>
+            <button onClick={handleAddToCart} disabled={product.stock_quantity === 0}>
+              ADD TO CART
+            </button>
           </div>
         </div>
       </section>

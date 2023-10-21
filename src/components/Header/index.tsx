@@ -26,6 +26,20 @@ export default function Header() {
   };
   // Mui menu account end
 
+  //check so luong san pham trong cart
+  const totalQuantityCart = () => {
+    const cart = auth.user?.cart;
+    let totalQuantity = 0;
+    if (cart) {
+      // Duyệt qua mảng và cộng dồn quantity
+      for (const item of cart) {
+        totalQuantity += item.quantity;
+      }
+      return totalQuantity;
+    }
+    return totalQuantity;
+  };
+
   const handleLogout = async () => {
     handleClose();
     localStorage.removeItem('userLogin');
@@ -69,7 +83,7 @@ export default function Header() {
               Cart
               <span className="nav__btns--cart-icon">
                 <FaShoppingCart />
-                <span>0</span>
+                <span>{totalQuantityCart()}</span>
               </span>
             </Link>
             {auth.isLogin ? (
@@ -112,7 +126,7 @@ export default function Header() {
             Cart
             <span className="nav__btns--cart-icon">
               <FaShoppingCart />
-              <span>0</span>
+              <span>{totalQuantityCart()}</span>
             </span>
           </Link>
           {auth.isLogin ? (
