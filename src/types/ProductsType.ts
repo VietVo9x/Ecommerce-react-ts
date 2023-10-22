@@ -3,7 +3,7 @@ export interface I_product {
   category_name: string;
   product_name: string;
   description: string;
-  unit_price: string;
+  unit_price: number;
   stock_quantity: number;
   image: string;
   created_at: string;
@@ -18,7 +18,7 @@ export interface I_productUser {
   category_name: string;
   product_name: string;
   description: string;
-  unit_price: string;
+  unit_price: number;
   id: string;
   image: string;
   created_at: string;

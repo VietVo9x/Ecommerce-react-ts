@@ -18,7 +18,7 @@ export interface ProductEntities {
   category_name: string;
   product_name: string;
   description: string;
-  unit_price: string;
+  unit_price: number;
   stock_quantity: number;
   image: string;
   created_at: string;

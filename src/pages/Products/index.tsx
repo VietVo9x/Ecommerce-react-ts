@@ -19,43 +19,79 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 
 import './style.scss';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { I_product } from '../../types/ProductsType';
 import { getDataFilter } from '../../utils/DB';
-import { useSelector } from 'react-redux';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { perPage } from '../../utils/constant';
+import { category } from '../../models';
 export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [count, setCount] = useState(0);
-  const page = Number(searchParams.get('page'));
-  const cate = searchParams.get('category');
-  const search = searchParams.get('search');
-
+  const [searchValue, setSearchValue] = useState<string>('');
   const [products, setProducts] = useState<I_product[]>([]); // products da ta
+  const [sortValue, setSortValue] = useState('');
+  const [sortOrder, setSortOrder] = useState('');
+  const page = Number(searchParams.get('page')) || 1;
+  const cate = searchParams.get('category') || '';
+  const search = searchParams.get('search') || '';
+  console.log(sortValue, sortOrder);
+  const params: any = {};
+  searchParams.forEach((value, key) => {
+    params[key] = value;
+  });
+
+  console.log(params); // { page: 5, pageSize: 25 }
 
   //mui
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    setSearchParams({ page: value.toString() });
+    setSearchParams({ ...params, page: value.toString() });
+  };
+  const handleSearch = () => {
+    console.log('searchValue');
+    setSearchParams({ ...params, search: searchValue });
   };
 
   const [age, setAge] = React.useState('');
-  const [value, setValue] = React.useState('All');
 
   //data products
   useEffect(() => {
-    getDataFilter(`products?_page=${page}&_limit=6`).then((res) => {
+    getDataFilter(
+      `products?_page=${page}&_limit=6&product_name_like=${search}&category_name_like=${cate}&_sort=${sortValue}&_order=${sortOrder}`,
+    ).then((res) => {
       setProducts(res?.data);
       setCount(Math.ceil(res?.headers['x-total-count'] / perPage));
     });
-  }, [page]);
+  }, [page, search, cate, sortValue, sortOrder]);
 
   const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue((event.target as HTMLInputElement).value);
+    // setValue((event.target as HTMLInputElement).value);
+    setSearchParams({ ...params, category: event.target.value });
   };
 
   const handleChangeSelect = (event: SelectChangeEvent) => {
-    setAge(event.target.value as string);
+    setAge(event.target.value);
+    console.log(event.target.value as string);
+    switch (event.target.value.toString()) {
+      case '1':
+        setSortValue('product_name');
+        setSortOrder('asc');
+        break;
+
+      case '2':
+        setSortValue('product_name');
+        setSortOrder('desc');
+        break;
+
+      case '3':
+        setSortValue('unit_price');
+        setSortOrder('desc');
+        break;
+      case '4':
+        setSortValue('unit_price');
+        setSortOrder('asc');
+        break;
+    }
   };
 
   //filter
@@ -72,7 +108,14 @@ export default function Products() {
         <div className="products--side-bar">
           <FormGroup>
             <Box pb={5}>
-              <TextField id="outlined-basic" label="Search" variant="outlined" />
+              <TextField
+                id="outlined-basic"
+                label="Search"
+                variant="outlined"
+                value={searchValue}
+                onChange={(e: any) => setSearchValue(e.target.value)}
+              />
+              <Button onClick={handleSearch}>Search</Button>
             </Box>
             <Typography component={'h3'} variant="h5" pb={1} color={'primary'}>
               {' '}
@@ -81,10 +124,10 @@ export default function Products() {
             <RadioGroup
               aria-labelledby="demo-error-radios"
               name="quiz"
-              value={value}
+              value={cate}
               onChange={handleRadioChange}
             >
-              <FormControlLabel value="All" control={<Radio />} label="All" />
+              <FormControlLabel value="" control={<Radio />} label="All" />
               <FormControlLabel value="PC" control={<Radio />} label="PC " />
               <FormControlLabel value="Laptop" control={<Radio />} label="Laptop" />
               <FormControlLabel value="Accessories" control={<Radio />} label="Accessories" />
@@ -120,7 +163,7 @@ export default function Products() {
                   </div>
                   <h5 className="products--content__item--title">{product.product_name}</h5>
                   <div className="products--content__item--price">
-                    <p>{product.unit_price}$</p>
+                    <p>{product.unit_price}.00 $</p>
                   </div>
                   <div className="products--content__item--action">
                     <Tooltip title=" View" placement="top">
