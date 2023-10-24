@@ -14,6 +14,7 @@ import { RootState } from '../../redux/store/configureStore';
 import { getProducts } from '../../redux/slice/ProductStore';
 import { login } from '../../redux/slice/AuthSlice';
 import Auth from '../../utils/Auth';
+import PageHero from '../../components/PageHero';
 
 export default function SingleProduct() {
   const [value, setValue] = React.useState<number | null>(2);
@@ -50,10 +51,10 @@ export default function SingleProduct() {
       setTimeout(() => {
         navigate('/login');
       }, 2000);
+      return;
     }
     const response = await singleProductServices.addProductToCart(product, quantityInput);
     if (response) {
-      console.log(response);
       singleProductRepository.getAllProduct().then((res) => {
         dispatch(getProducts(res));
       });
@@ -68,6 +69,7 @@ export default function SingleProduct() {
   return (
     <>
       <ToastContainer />
+      <PageHero title={`Products / ${product.product_name}`} />
       <section className="container">
         <div className="btn--back">
           <Link to="/products">BACK TO PRODUCTS</Link>
@@ -78,11 +80,23 @@ export default function SingleProduct() {
               <img src={product?.image} alt="anh chinh" />
             </div>
             <div className="product__images--sub">
-              <img src={product?.image} alt="main image" />
-              <img src="https://www.course-api.com/images/store/extra-product-1.jpeg" alt="" />
-              <img src="https://www.course-api.com/images/store/extra-product-2.jpeg" alt="" />
-              <img src="https://www.course-api.com/images/store/extra-product-3.jpeg" alt="" />
-              <img src="https://www.course-api.com/images/store/extra-product-4.jpeg" alt="" />
+              <img src={product.image} alt={product.product_name} />
+              <img
+                src="https://product.hstatic.net/200000722513/product/i-dong-thonet-vander-duett-silver-666_74c833966b19439c863455d4bad4f09f_1872f4f94dbb494284eebf0d1eec654c_medium.jpg"
+                alt=""
+              />
+              <img
+                src="https://product.hstatic.net/200000722513/product/thumbchuot_d3fc60cd30fb4f98a8c944652687d073_4de309651e164446a1bffe4ce45a1438_medium.png"
+                alt=""
+              />
+              <img
+                src="https://product.hstatic.net/200000722513/product/gearvn-tai-nghe-dareu-eh416-rgb-1_50b1586d8678429aaee7922ec536c3f3_418f44656d36414e8b56e8c62927e5c7_medium.png"
+                alt=""
+              />
+              <img
+                src="https://product.hstatic.net/200000722513/product/1_df57f2bc10d745a29d751c4541326890_9cf75b8940a949ccaab795bb8bf1d949_medium.jpg"
+                alt=""
+              />
             </div>
           </div>
           <div className="product__content">
@@ -96,7 +110,7 @@ export default function SingleProduct() {
               <span>(100 customer reviews)</span>
             </div>
             <Typography component={'h5'} variant="h4" pt={2}>
-              ${product?.unit_price}
+              $ {product?.unit_price}.00
             </Typography>
             <p className="product__content--desc"> {product?.description}</p>
             <p className="product__content--info">

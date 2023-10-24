@@ -1,3 +1,5 @@
+import { I_productUser } from '../types/ProductsType';
+
 export interface UserEntities {
   id: string;
   email: string;
@@ -6,12 +8,11 @@ export interface UserEntities {
   fullName: string;
   phone: string;
   address: string;
-  cart: [];
+  cart: I_productUser[];
   role: false;
   status: true;
   created_at: string;
   update_at: string;
-  token?: string;
 }
 export interface ProductEntities {
   sku: string;
@@ -24,7 +25,14 @@ export interface ProductEntities {
   created_at: string;
   updated_at: string;
   id: string;
-  new?: boolean;
-  bestDeal?: boolean;
-  bestSelling?: boolean;
+  new: boolean;
+  bestDeal: boolean;
+  bestSelling: boolean;
+}
+export interface categoryEntities {
+  category_name: string;
+  description: string;
+  status: boolean;
+  category_id: string;
+  products: ProductEntities[];
 }

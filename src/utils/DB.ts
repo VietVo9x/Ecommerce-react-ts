@@ -51,3 +51,12 @@ export const putData = async (pathName: string, id: any, data: any) => {
     console.log(e);
   }
 };
+
+export const deleteData = async (pathName: string, id: any) => {
+  try {
+    const response = await axios.delete(api + pathName + '/' + id); // Chú ý cách bạn kết hợp pathName và id.
+    return response;
+  } catch (e) {
+    // Xử lý lỗi ở đây nếu cần.
+  }
+};

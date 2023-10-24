@@ -1,6 +1,7 @@
 .products {
   width: 1200px;
   max-width: 100%;
+  min-height: 100vh;
   padding: 60px 10px;
   margin: 0 auto;
 
@@ -10,9 +11,12 @@
   &--content {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    gap: 15px;
     transition: all 0.3s linear;
     &__item {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       border-radius: 4px;
       padding: 20px;
       text-align: center;
@@ -37,7 +41,8 @@
       }
       &--title {
         display: block;
-        padding: 10px;
+        font-size: 16px;
+        padding-top: 15px;
         &:hover {
           color: var(--secondary-color);
         }
@@ -53,10 +58,9 @@
         }
       }
       &--action {
-        margin-top: 10px;
         display: flex;
-        justify-content: center;
-        gap: 20px;
+        justify-content: space-between;
+        align-items: center;
         button {
           border-radius: 50%;
           width: 50px;

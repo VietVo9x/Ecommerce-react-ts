@@ -17,10 +17,10 @@ export class SingleProductServices {
       image: product.image,
       created_at: product.created_at,
       updated_at: product.updated_at,
-      quantity: 1,
-      new: false,
-      bestDeal: false,
-      bestSelling: false,
+      quantity: qtyInput,
+      new: product.new,
+      bestDeal: product.bestDeal,
+      bestSelling: product.bestSelling,
     };
     if (userLocal) {
       const userLogin = JSON.parse(userLocal);
@@ -30,27 +30,16 @@ export class SingleProductServices {
         (productCart: I_productUser) => productCart.product_name === product.product_name,
       );
       if (productCart) {
-        // da co san pham do trong cart
         productCart.quantity = productCart.quantity + qtyInput;
+        console.log(productCart);
         const updateUserCart = await singleProductRepository.updateCartUser(userDB.id, userDB);
-        // const downQty = product.stock_quantity - qtyInput;
-        // const newProductDB = { ...product, stock_quantity: downQty };
-        // const updateProductDB = await singleProductRepository.updateProductDB(
-        //   product.id,
-        //   newProductDB,
-        // );
+
         return updateUserCart;
       } else {
         //neu chua co san pham do trong cart
+        console.log(productCart);
         userDB.cart.push(newProduct);
         const updateUserCart = await singleProductRepository.updateCartUser(userDB.id, userDB);
-        //giam instock_quantity product trong store
-        // const downQty = product.stock_quantity - 1;
-        // const newProductDB = { ...product, stock_quantity: downQty };
-        // const updateProductDB = await singleProductRepository.updateProductDB(
-        //   product.id,
-        //   newProductDB,
-        // );
         return updateUserCart;
       }
     }

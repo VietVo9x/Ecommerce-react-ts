@@ -1,18 +1,15 @@
-import { Box, Button, Modal, Stack, Typography } from '@mui/material';
+import { Button } from '@mui/material';
 import PageHero from '../../components/PageHero';
 import './style.scss';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store/configureStore';
 import { I_productUser } from '../../types/ProductsType';
-import { CartRepository } from './CartRepository';
 import { CartServices } from './CartServices';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Link } from 'react-router-dom';
-import React, { useState } from 'react';
 import Auth from '../../utils/Auth';
 import { login } from '../../redux/slice/AuthSlice';
 export default function Cart() {
-  const cartRepository = new CartRepository();
   const cartServices = new CartServices();
   const auth: {
     isLogin: boolean;
@@ -25,8 +22,9 @@ export default function Cart() {
       totalPriceOrder += product.quantity * Number(product.unit_price);
     });
   }
+  //tang giam so luong
   const handleUpdateQty = async (condition: 'up' | 'down', id: string, qty: number) => {
-    const response = await cartServices.updateProductUser({ id, qty, user: auth?.user, condition });
+    const response = await cartServices.updateProductUser({ id, user: auth?.user, condition });
     if (response.id) {
       Auth().then((res) => {
         if (res) {
@@ -35,6 +33,7 @@ export default function Cart() {
       });
     }
   };
+  // xoa 1 product
   const handleDelete = async (id: string) => {
     const conf = window.confirm('Are you sure you want to delete');
     if (!conf) return;
@@ -45,6 +44,23 @@ export default function Cart() {
           dispatch(login(res));
         }
       });
+    }
+  };
+  //clear cart
+  const handleClearCart = async () => {
+    const conf = window.confirm('Are you sure you want to clear your cart');
+    if (!conf) return;
+    if (auth.user !== undefined) {
+      const id = auth.user.id;
+      const user = auth.user;
+      const response = await cartServices.deleteCart(id, user);
+      if (response) {
+        Auth().then((res) => {
+          if (res) {
+            dispatch(login(res));
+          }
+        });
+      }
     }
   };
   return (
@@ -71,7 +87,7 @@ export default function Cart() {
                     <img src={item.image} alt="" />
                   </td>
                   <td>{item.product_name}</td>
-                  <td>{item.unit_price} $</td>
+                  <td>$ {item.unit_price}.00</td>
                   <td className="cart__table--value">
                     <Button
                       variant="text"
@@ -88,7 +104,7 @@ export default function Cart() {
                       <span>+</span>
                     </Button>
                   </td>
-                  <td>{item.quantity * Number(item.unit_price)}.00 $</td>
+                  <td>$ {item.quantity * Number(item.unit_price)}.00</td>
                   <td>
                     <Button variant="text" color="error" onClick={() => handleDelete(item.id)}>
                       <DeleteIcon />
@@ -100,9 +116,9 @@ export default function Cart() {
           </table>
           <div className="cart__btns">
             <Button variant="contained" color="secondary">
-              Continue Shopping
+              <Link to={'/products'}>Continue Shopping</Link>
             </Button>
-            <Button variant="contained" color="warning">
+            <Button variant="contained" color="warning" onClick={handleClearCart}>
               Clear Shopping Cart
             </Button>
           </div>

@@ -7,6 +7,7 @@ export default async function Auth() {
     const userLocal = JSON.parse(auth);
     const users = await getData('users');
     const user = users.find((user: UserEntities) => user.id === userLocal.id);
+    console.log(user);
     return user;
   }
 }

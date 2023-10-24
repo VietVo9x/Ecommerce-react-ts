@@ -1,6 +1,5 @@
 import * as React from 'react';
 import PageHero from '../../components/PageHero';
-import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
@@ -19,13 +18,14 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 
 import './style.scss';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { I_product } from '../../types/ProductsType';
-import { getDataFilter } from '../../utils/DB';
+import { getData, getDataFilter } from '../../utils/DB';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { perPage } from '../../utils/constant';
-import { category } from '../../models';
+import { categoryEntities } from '../../Entities';
 export default function Products() {
+  const [categorys, setCategorys] = useState<categoryEntities[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [count, setCount] = useState(0);
   const [searchValue, setSearchValue] = useState<string>('');
@@ -35,25 +35,26 @@ export default function Products() {
   const page = Number(searchParams.get('page')) || 1;
   const cate = searchParams.get('category') || '';
   const search = searchParams.get('search') || '';
-  console.log(sortValue, sortOrder);
   const params: any = {};
   searchParams.forEach((value, key) => {
     params[key] = value;
   });
-
-  console.log(params); // { page: 5, pageSize: 25 }
-
   //mui
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setSearchParams({ ...params, page: value.toString() });
   };
   const handleSearch = () => {
-    console.log('searchValue');
     setSearchParams({ ...params, search: searchValue });
   };
 
   const [age, setAge] = React.useState('');
 
+  //lay data category
+  useEffect(() => {
+    getData('categorys').then((res) => {
+      setCategorys(res);
+    });
+  }, []);
   //data products
   useEffect(() => {
     getDataFilter(
@@ -66,12 +67,13 @@ export default function Products() {
 
   const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     // setValue((event.target as HTMLInputElement).value);
-    setSearchParams({ ...params, category: event.target.value });
+    setSearchParams({ ...params, category: event.target.value, page: 1 });
   };
 
   const handleChangeSelect = (event: SelectChangeEvent) => {
+    setSearchParams({ ...params, page: '1' });
     setAge(event.target.value);
-    console.log(event.target.value as string);
+
     switch (event.target.value.toString()) {
       case '1':
         setSortValue('product_name');
@@ -85,11 +87,12 @@ export default function Products() {
 
       case '3':
         setSortValue('unit_price');
-        setSortOrder('desc');
+        setSortOrder('asc');
+
         break;
       case '4':
         setSortValue('unit_price');
-        setSortOrder('asc');
+        setSortOrder('desc');
         break;
     }
   };
@@ -107,7 +110,7 @@ export default function Products() {
       <div className="products">
         <div className="products--side-bar">
           <FormGroup>
-            <Box pb={5}>
+            <Box pb={5} display={'flex'}>
               <TextField
                 id="outlined-basic"
                 label="Search"
@@ -115,7 +118,9 @@ export default function Products() {
                 value={searchValue}
                 onChange={(e: any) => setSearchValue(e.target.value)}
               />
-              <Button onClick={handleSearch}>Search</Button>
+              <Button onClick={handleSearch} variant="contained">
+                Search
+              </Button>
             </Box>
             <Typography component={'h3'} variant="h5" pb={1} color={'primary'}>
               {' '}
@@ -128,10 +133,16 @@ export default function Products() {
               onChange={handleRadioChange}
             >
               <FormControlLabel value="" control={<Radio />} label="All" />
-              <FormControlLabel value="PC" control={<Radio />} label="PC " />
-              <FormControlLabel value="Laptop" control={<Radio />} label="Laptop" />
-              <FormControlLabel value="Accessories" control={<Radio />} label="Accessories" />
-              <FormControlLabel value="Gaming Gear" control={<Radio />} label="Gaming Gear" />
+
+              {categorys &&
+                categorys.map((element, index) => (
+                  <FormControlLabel
+                    value={element.category_name}
+                    control={<Radio />}
+                    label={element.category_name}
+                    key={index}
+                  />
+                ))}
             </RadioGroup>
           </FormGroup>
         </div>
@@ -162,19 +173,18 @@ export default function Products() {
                     <img src={product.image} alt="" />
                   </div>
                   <h5 className="products--content__item--title">{product.product_name}</h5>
-                  <div className="products--content__item--price">
-                    <p>{product.unit_price}.00 $</p>
-                  </div>
-                  <div className="products--content__item--action">
-                    <Tooltip title=" View" placement="top">
-                      <Button color="inherit" onClick={() => handleView(product.id)}>
-                        {' '}
-                        <RemoveRedEyeOutlinedIcon />
-                      </Button>
-                    </Tooltip>
 
-                    <Tooltip title=" Add to cart" placement="top">
-                      <Button color="inherit">
+                  <div className="products--content__item--action">
+                    <div className="products--content__item--price">
+                      <p>$ {product.unit_price}.00</p>
+                    </div>
+
+                    <Tooltip
+                      title=" Add to cart"
+                      placement="top"
+                      onClick={() => handleView(product.id)}
+                    >
+                      <Button>
                         {' '}
                         <ShoppingCartOutlinedIcon />
                       </Button>

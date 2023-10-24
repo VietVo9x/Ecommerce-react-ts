@@ -5,16 +5,23 @@ import MenuItem from '@mui/material/MenuItem';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import './style.scss';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaShoppingCart, FaUserPlus, FaBars, FaWindowClose } from 'react-icons/fa';
 import { links } from '../../routes';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux/es/exports';
 import { I_authState, logout } from '../../redux/slice/AuthSlice';
+import { RootState } from '../../redux/store/configureStore';
+import { I_productUser } from '../../types/ProductsType';
 export default function Header() {
   const [showNavMobile, setShowNavMobile] = useState(false);
-  const auth = useSelector((state: { auth: I_authState }) => state.auth);
+  const auth: {
+    isLogin: boolean;
+    user: any;
+  } = useSelector((state: RootState) => state.auth);
+
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   // Mui menu account start
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -27,23 +34,19 @@ export default function Header() {
   // Mui menu account end
 
   //check so luong san pham trong cart
-  const totalQuantityCart = () => {
-    const cart = auth.user?.cart;
-    let totalQuantity = 0;
-    if (cart) {
-      // Duyệt qua mảng và cộng dồn quantity
-      for (const item of cart) {
-        totalQuantity += item.quantity;
-      }
-      return totalQuantity;
-    }
-    return totalQuantity;
-  };
+  let totalQuantity = 0;
+  if (auth.user !== undefined) {
+    console.log(auth.user.cart);
+    auth.user.cart.forEach(function (product: I_productUser) {
+      totalQuantity += product.quantity;
+    });
+  }
 
   const handleLogout = async () => {
     handleClose();
     localStorage.removeItem('userLogin');
     dispatch(logout());
+    navigate('/login');
   };
 
   return (
@@ -83,7 +86,7 @@ export default function Header() {
               Cart
               <span className="nav__btns--cart-icon">
                 <FaShoppingCart />
-                <span>{totalQuantityCart()}</span>
+                <span>{totalQuantity}</span>
               </span>
             </Link>
             {auth.isLogin ? (
@@ -126,7 +129,7 @@ export default function Header() {
             Cart
             <span className="nav__btns--cart-icon">
               <FaShoppingCart />
-              <span>{totalQuantityCart()}</span>
+              <span>{totalQuantity}</span>
             </span>
           </Link>
           {auth.isLogin ? (

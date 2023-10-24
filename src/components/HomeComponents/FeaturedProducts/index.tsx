@@ -9,14 +9,32 @@ import { Tabs, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import './style.scss';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../redux/store/configureStore';
+import { useEffect, useState } from 'react';
+import { I_product } from '../../../types/ProductsType';
 
 export default function FeaturedProducts() {
-  const [value, setValue] = React.useState('1');
+  const products = useSelector((state: RootState) => state.products.data);
+  const [listData, setListData] = useState<I_product[]>([]);
 
+  const [value, setValue] = React.useState('new');
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
+  //handle view
+  const navigate = useNavigate();
+  const handleView = (id: string) => {
+    navigate('/products/' + id);
+  };
+  useEffect(() => {
+    if (products && (value == 'new' || value == 'bestSelling' || value == 'bestDeal')) {
+      const newData = products.filter((product) => product[value]);
+      setListData(newData);
+    }
+  }, [value]);
+
   return (
     <section className="featured-product--wrapper">
       <Typography variant="h3" component={'h5'} align="center" p={5}>
@@ -34,125 +52,86 @@ export default function FeaturedProducts() {
               indicatorColor="secondary"
               aria-label="secondary tabs example"
             >
-              <Tab label="New Product" value="1" />
-              <Tab label="Best Deal" value="2" />
-              <Tab label="Best Selling" value="3" />
+              <Tab label="New Product" value="new" />
+              <Tab label="Best Deal" value="bestDeal" />
+              <Tab label="Best Selling" value="bestSelling" />
             </Tabs>
           </Box>
-          <TabPanel value="1">
+          <TabPanel value="new">
             <div className="featured-product">
-              <div className="featured-product__item">
-                <div className="featured-product__item--image">
-                  <img
-                    src="https://mega.com.vn/media/product/250_19968_tai_nghe_khong_day_logitech_g733_lightspeed_rgb_mau_den.jpg"
-                    alt="tai nghe"
-                  />
-                </div>
-                <h3 className="featured-product__item--title">San pham 1</h3>
-                <div className="featured-product__item--price">
-                  <p>300.00$</p> <sub>350.00$</sub>
-                </div>
-                <div className="featured-product__item--action">
-                  <Tooltip title=" View" placement="top">
-                    <Button color="inherit">
-                      {' '}
-                      <RemoveRedEyeOutlinedIcon />
-                    </Button>
-                  </Tooltip>
+              {listData.map((element, index) => (
+                <div className="featured-product__item" key={index}>
+                  <div className="featured-product__item--image">
+                    <img src={element.image} alt={element.product_name} />
+                  </div>
+                  <h5 className="featured-product__item--title">{element.product_name}</h5>
 
-                  <Tooltip title=" Add to cart" placement="top">
-                    <Button color="inherit">
-                      {' '}
-                      <ShoppingCartOutlinedIcon />
-                    </Button>
-                  </Tooltip>
-                </div>
-              </div>
-              <div className="featured-product__item">
-                <div className="featured-product__item--image">
-                  <img
-                    src="https://mega.com.vn/media/product/250_19968_tai_nghe_khong_day_logitech_g733_lightspeed_rgb_mau_den.jpg"
-                    alt="tai nghe"
-                  />
-                </div>
-                <h3 className="featured-product__item--title">San pham 1</h3>
-                <div className="featured-product__item--price">
-                  <p>300.00$</p> <sub>350.00$</sub>
-                </div>
-                <div className="featured-product__item--action">
-                  <Tooltip title=" View" placement="top">
-                    <Button color="inherit">
-                      {' '}
-                      <RemoveRedEyeOutlinedIcon />
-                    </Button>
-                  </Tooltip>
+                  <div className="featured-product__item--actions">
+                    <div className="featured-product__item--price">
+                      <p>$ {element.unit_price}.00</p>
+                    </div>
 
-                  <Tooltip title=" Add to cart" placement="top">
-                    <Button color="inherit">
-                      {' '}
-                      <ShoppingCartOutlinedIcon />
-                    </Button>
-                  </Tooltip>
+                    <Tooltip title="Add to cart" placement="top">
+                      <Button onClick={() => handleView(element.id)}>
+                        {' '}
+                        <ShoppingCartOutlinedIcon />
+                      </Button>
+                    </Tooltip>
+                  </div>
                 </div>
-              </div>
-              <div className="featured-product__item">
-                <div className="featured-product__item--image">
-                  <img
-                    src="https://mega.com.vn/media/product/250_19968_tai_nghe_khong_day_logitech_g733_lightspeed_rgb_mau_den.jpg"
-                    alt="tai nghe"
-                  />
-                </div>
-                <h3 className="featured-product__item--title">San pham 1</h3>
-                <div className="featured-product__item--price">
-                  <p>300.00$</p> <sub>350.00$</sub>
-                </div>
-                <div className="featured-product__item--action">
-                  <Tooltip title=" View" placement="top">
-                    <Button color="inherit">
-                      {' '}
-                      <RemoveRedEyeOutlinedIcon />
-                    </Button>
-                  </Tooltip>
-
-                  <Tooltip title=" Add to cart" placement="top">
-                    <Button color="inherit">
-                      {' '}
-                      <ShoppingCartOutlinedIcon />
-                    </Button>
-                  </Tooltip>
-                </div>
-              </div>
-              <div className="featured-product__item">
-                <div className="featured-product__item--image">
-                  <img
-                    src="https://mega.com.vn/media/product/250_19968_tai_nghe_khong_day_logitech_g733_lightspeed_rgb_mau_den.jpg"
-                    alt="tai nghe"
-                  />
-                </div>
-                <h3 className="featured-product__item--title">San pham 1</h3>
-                <div className="featured-product__item--price">
-                  <p>300.00$</p> <sub>350.00$</sub>
-                </div>
-                <div className="featured-product__item--action">
-                  <Tooltip title=" View" placement="top">
-                    <Button color="inherit">
-                      {' '}
-                      <RemoveRedEyeOutlinedIcon />
-                    </Button>
-                  </Tooltip>
-
-                  <Tooltip title=" Add to cart" placement="top">
-                    <Button color="inherit">
-                      {' '}
-                      <ShoppingCartOutlinedIcon />
-                    </Button>
-                  </Tooltip>
-                </div>
-              </div>
+              ))}
             </div>
           </TabPanel>
-          <TabPanel value="2">Item Two</TabPanel>
-          <TabPanel value="3">Item Three</TabPanel>
+          <TabPanel value="bestDeal">
+            <div className="featured-product">
+              {listData.map((element, index) => (
+                <div className="featured-product__item" key={index}>
+                  <div className="featured-product__item--image">
+                    <img src={element.image} alt={element.product_name} />
+                  </div>
+                  <h5 className="featured-product__item--title">{element.product_name}</h5>
+
+                  <div className="featured-product__item--actions">
+                    <div className="featured-product__item--price">
+                      <p>$ {element.unit_price}.00</p>
+                    </div>
+
+                    <Tooltip title="Add to cart" placement="top">
+                      <Button onClick={() => handleView(element.id)}>
+                        {' '}
+                        <ShoppingCartOutlinedIcon />
+                      </Button>
+                    </Tooltip>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </TabPanel>
+          <TabPanel value="bestSelling">
+            <div className="featured-product">
+              {listData.map((element, index) => (
+                <div className="featured-product__item" key={index}>
+                  <div className="featured-product__item--image">
+                    <img src={element.image} alt={element.product_name} />
+                  </div>
+                  <h5 className="featured-product__item--title">{element.product_name}</h5>
+
+                  <div className="featured-product__item--actions">
+                    <div className="featured-product__item--price">
+                      <p>$ {element.unit_price}.00</p>
+                    </div>
+
+                    <Tooltip title="Add to cart" placement="top">
+                      <Button onClick={() => handleView(element.id)}>
+                        {' '}
+                        <ShoppingCartOutlinedIcon />
+                      </Button>
+                    </Tooltip>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </TabPanel>
         </TabContext>
       </Box>
 

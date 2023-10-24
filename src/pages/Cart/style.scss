@@ -41,6 +41,11 @@
     margin-top: 30px;
     display: flex;
     justify-content: space-between;
+    & > button {
+      & > a {
+        color: #fff;
+      }
+    }
   }
   &__checkout {
     width: 400px;
@@ -60,8 +65,8 @@
       }
     }
     &--btn {
-      button {
-        a {
+      & > button {
+        & > a {
           color: #fff;
         }
       }

@@ -1,6 +1,6 @@
 export interface I_product {
   sku: string;
-  category_name: string;
+
   product_name: string;
   description: string;
   unit_price: number;
@@ -9,6 +9,7 @@ export interface I_product {
   created_at: string;
   updated_at: string;
   id: string;
+  category_name: string;
   new?: boolean;
   bestDeal?: boolean;
   bestSelling?: boolean;

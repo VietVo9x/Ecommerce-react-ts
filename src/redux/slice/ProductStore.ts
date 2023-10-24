@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { I_product } from '../../types/ProductsType';
 
-interface I_productState {
+export interface I_productState {
   data: I_product[];
 }
 const initialState: I_productState = {

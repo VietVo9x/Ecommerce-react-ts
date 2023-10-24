@@ -45,6 +45,7 @@
     }
     &--title {
       display: block;
+      font-size: 16px;
       padding: 10px;
       &:hover {
         color: var(--secondary-color);
@@ -63,15 +64,18 @@
         text-decoration: line-through;
       }
     }
-    &--action {
+    &--actions {
       margin-top: 10px;
       display: flex;
-      justify-content: center;
-      gap: 20px;
+      justify-content: space-between;
+      align-items: center;
       button {
         border-radius: 50%;
         width: 50px;
         height: 50px;
+        & > a {
+          color: inherit;
+        }
       }
     }
   }

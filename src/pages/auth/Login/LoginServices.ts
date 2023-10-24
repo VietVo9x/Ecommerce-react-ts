@@ -15,7 +15,6 @@ export class LoginServices {
     });
     if (user) {
       const login = await loginRepository.postUser(user.id);
-
       return login;
     }
   }
@@ -41,7 +40,7 @@ export class LoginServices {
       error.isError = true;
       error.msgPassword = 'Password must be at least 6 characters long';
     }
-    //check email databas
+    //check email database
     const users = await loginRepository.getAllUser();
     const user = users.find((user: UserEntities) => {
       if (user.email == dataForm.email) {
@@ -51,7 +50,11 @@ export class LoginServices {
       }
     });
     if (user) {
-      return error;
+      if (!user.status) {
+        error.isError = true;
+        error.msgEmail = 'Your email is currently locked';
+        return error;
+      }
     } else {
       error.isError = true;
       error.msgEmail = 'Email or password is incorrect.';
