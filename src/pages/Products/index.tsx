@@ -19,17 +19,17 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 
 import './style.scss';
 import { useEffect, useState } from 'react';
-import { I_product } from '../../types/ProductsType';
-import { getData, getDataFilter } from '../../utils/DB';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { getData } from '../../utils/DB';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { _CATEGORY, _PRODUCT } from '../../utils/constantAPI';
+import { Res_Category, Res_Product } from '../../types/response.type';
 import { perPage } from '../../utils/constant';
-import { categoryEntities } from '../../Entities';
 export default function Products() {
-  const [categorys, setCategorys] = useState<categoryEntities[]>([]);
+  const [categorys, setCategorys] = useState<Res_Category[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [count, setCount] = useState(0);
   const [searchValue, setSearchValue] = useState<string>('');
-  const [products, setProducts] = useState<I_product[]>([]); // products da ta
+  const [products, setProducts] = useState<Res_Product[]>([]);
   const [sortValue, setSortValue] = useState('');
   const [sortOrder, setSortOrder] = useState('');
   const page = Number(searchParams.get('page')) || 1;
@@ -39,60 +39,81 @@ export default function Products() {
   searchParams.forEach((value, key) => {
     params[key] = value;
   });
+
   //mui
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setSearchParams({ ...params, page: value.toString() });
-  };
-  const handleSearch = () => {
-    setSearchParams({ ...params, search: searchValue });
+    setCount(() => Math.ceil(products.length / perPage));
   };
 
+  const handleSearch = (e: { target: { value: string } }) => {
+    setSearchValue(e?.target.value);
+    setTimeout(() => {
+      setSearchParams({ ...params, search: e?.target.value, page: '1' });
+      setCount(() => Math.ceil(products.length / perPage));
+    }, 2000);
+  };
+  const clearSearch = () => {
+    setSearchParams({ ...params, search: '' });
+    setSearchValue('');
+  };
   const [age, setAge] = React.useState('');
 
   //lay data category
   useEffect(() => {
-    getData('categorys').then((res) => {
-      setCategorys(res);
+    getData(_CATEGORY).then((res) => {
+      setCategorys(res?.data);
     });
   }, []);
   //data products
   useEffect(() => {
-    getDataFilter(
-      `products?_page=${page}&_limit=6&product_name_like=${search}&category_name_like=${cate}&_sort=${sortValue}&_order=${sortOrder}`,
-    ).then((res) => {
-      setProducts(res?.data);
-      setCount(Math.ceil(res?.headers['x-total-count'] / perPage));
-    });
+    if (cate === '') {
+      getData(
+        `${_PRODUCT}?page=${page}&limit=${perPage}&name=${search}&sort=${sortValue}&order=${sortOrder}`,
+      ).then((res) => {
+        setCount(Math.ceil(Number(res?.headers['x-total-products']) / perPage));
+        setProducts([...res?.data]);
+      });
+    } else {
+      // Gọi lại API và cập nhật count khi cate thay đổi
+      getData(
+        `/product?page=${page}&limit=${perPage}&name=${search}&category=${cate}&sort=${sortValue}&order=${sortOrder}`,
+      ).then((res) => {
+        setProducts([...res?.data]);
+      });
+    }
   }, [page, search, cate, sortValue, sortOrder]);
 
   const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     // setValue((event.target as HTMLInputElement).value);
     setSearchParams({ ...params, category: event.target.value, page: 1 });
+    setCount(Math.ceil(products.length / perPage));
   };
 
   const handleChangeSelect = (event: SelectChangeEvent) => {
     setSearchParams({ ...params, page: '1' });
     setAge(event.target.value);
+    setCount(Math.ceil(products.length / perPage));
 
     switch (event.target.value.toString()) {
       case '1':
         setSortValue('product_name');
-        setSortOrder('asc');
+        setSortOrder('ASC');
         break;
 
       case '2':
         setSortValue('product_name');
-        setSortOrder('desc');
+        setSortOrder('DESC');
         break;
 
       case '3':
-        setSortValue('unit_price');
-        setSortOrder('asc');
+        setSortValue('price');
+        setSortOrder('ASC');
 
         break;
       case '4':
-        setSortValue('unit_price');
-        setSortOrder('desc');
+        setSortValue('price');
+        setSortOrder('DESC');
         break;
     }
   };
@@ -101,7 +122,7 @@ export default function Products() {
 
   //handle view
   const navigate = useNavigate();
-  const handleView = (id: string) => {
+  const handleView = (id: number) => {
     navigate('/products/' + id);
   };
   return (
@@ -116,10 +137,12 @@ export default function Products() {
                 label="Search"
                 variant="outlined"
                 value={searchValue}
-                onChange={(e: any) => setSearchValue(e.target.value)}
+                onChange={(e) => {
+                  handleSearch(e);
+                }}
               />
-              <Button onClick={handleSearch} variant="contained">
-                Search
+              <Button onClick={clearSearch} variant="contained">
+                Clear
               </Button>
             </Box>
             <Typography component={'h3'} variant="h5" pb={1} color={'primary'}>
@@ -137,7 +160,7 @@ export default function Products() {
               {categorys &&
                 categorys.map((element, index) => (
                   <FormControlLabel
-                    value={element.category_name}
+                    value={element.id}
                     control={<Radio />}
                     label={element.category_name}
                     key={index}
@@ -170,13 +193,15 @@ export default function Products() {
               products.map((product) => (
                 <div className="products--content__item" key={product.id}>
                   <div className="products--content__item--image">
-                    <img src={product.image} alt="" />
+                    {product.imageProducts.map((image, index) => (
+                      <img src={image.image_url} alt={image.image_url} key={index} />
+                    ))}
                   </div>
                   <h5 className="products--content__item--title">{product.product_name}</h5>
 
                   <div className="products--content__item--action">
                     <div className="products--content__item--price">
-                      <p>$ {product.unit_price}.00</p>
+                      <p>$ {product.price}.00</p>
                     </div>
 
                     <Tooltip

@@ -9,6 +9,7 @@ import { customTheme } from './utils/customTheme';
 import 'react-toastify/dist/ReactToastify.css';
 import { Provider } from 'react-redux';
 import { store } from './redux/store/configureStore';
+// import { store } from './redux/store/configureStore';
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
 root.render(

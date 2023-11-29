@@ -1,24 +1,19 @@
-import { LoginRepository } from './LoginRepository';
-import { I_UserLogin } from '../../../types/LoginType';
-import md5 from 'md5';
-import { UserEntities } from '../../../Entities';
-const loginRepository = new LoginRepository();
+import { AxiosError } from 'axios';
+import { F_UserLogin } from '../../../types/form.type';
+import { getData, insertData } from '../../../utils/DB';
+import { _USER_LOGIN, _VERIFY_TOKEN } from '../../../utils/constantAPI';
 export class LoginServices {
-  async onLogin(dataForm: I_UserLogin) {
-    const users = await loginRepository.getAllUser();
-    const user = users.find((user: UserEntities) => {
-      if (user.email == dataForm.email) {
-        if (user.password == md5(dataForm.password)) {
-          return true;
-        }
-      }
-    });
-    if (user) {
-      const login = await loginRepository.postUser(user.id);
-      return login;
+  async onLogin(dataForm: F_UserLogin) {
+    try {
+      const userLogin = await insertData(_USER_LOGIN, dataForm);
+      localStorage.setItem('token', userLogin?.headers.authorization);
+      return userLogin;
+    } catch (error) {
+      throw error;
     }
   }
-  async validator(dataForm: I_UserLogin) {
+
+  async validator(dataForm: F_UserLogin) {
     const error = {
       isError: false,
       msgEmail: '',
@@ -36,29 +31,14 @@ export class LoginServices {
     if (!dataForm.password) {
       error.isError = true;
       error.msgPassword = 'Password cannot be empty';
-    } else if (dataForm.password.length < 6) {
+    } else if (dataForm.password.length < 8) {
       error.isError = true;
-      error.msgPassword = 'Password must be at least 6 characters long';
-    }
-    //check email database
-    const users = await loginRepository.getAllUser();
-    const user = users.find((user: UserEntities) => {
-      if (user.email == dataForm.email) {
-        if (user.password == md5(dataForm.password)) {
-          return true;
-        }
-      }
-    });
-    if (user) {
-      if (!user.status) {
-        error.isError = true;
-        error.msgEmail = 'Your email is currently locked';
-        return error;
-      }
-    } else {
+      error.msgPassword = 'Password must be at least 8 characters long';
+    } else if (dataForm.password.length > 20) {
       error.isError = true;
-      error.msgEmail = 'Email or password is incorrect.';
+      error.msgPassword = 'Password must not be longer than 20 characters';
     }
+
     // return all error
     return error;
   }

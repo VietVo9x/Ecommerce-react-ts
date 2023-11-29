@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import './style.scss';
 export default function ErrorPage() {
   return (
@@ -5,7 +6,9 @@ export default function ErrorPage() {
       <div className="error__container">
         <h1>OOPS!</h1>
         <h3>404 - THE PAGE CAN'T BE FOUND</h3>
-        <button>BACK TO HOME</button>
+        <button>
+          <Link to={'/'}>BACK TO HOME</Link>
+        </button>
       </div>
     </section>
   );

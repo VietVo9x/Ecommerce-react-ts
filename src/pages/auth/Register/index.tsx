@@ -7,28 +7,25 @@ import Typography from '@mui/material/Typography';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import './style.scss';
-import { I_RegisterError, I_UserRegister } from '../../../types/RegisterType';
 import RegisterServices from './RegisterServices';
+import { F_UserRegister } from '../../../types/form.type';
+import { Err_UserRegister } from '../../../types/error.type';
+import { Res_Err_User_Register } from '../../../types/error.res';
+import { ToastContainer, toast } from 'react-toastify';
 
 export default function Register() {
   const navigate = useNavigate();
   const registerServices = new RegisterServices();
-  const [dataForm, setFormData] = useState<I_UserRegister>({
-    password: '',
+  const [dataForm, setFormData] = useState<F_UserRegister>({
     email: '',
-    userName: '',
-    fullName: '',
-    repeatPassword: '',
-    phone: '',
-    address: '',
+    user_name: '',
+    password: '',
+    confirm_password: '',
   });
-  const [error, setError] = useState<I_RegisterError>({
+  const [errors, setErrors] = useState<Err_UserRegister>({
     isError: false,
     msgEmail: '',
-    msgPhone: '',
     msgUserName: '',
-    msgFullName: '',
-    msgAddress: '',
     msgPassword: '',
     msgPasswordConfirm: '',
   });
@@ -36,26 +33,41 @@ export default function Register() {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
     const value = event.target.value;
-    setFormData((prev: I_UserRegister) => ({ ...prev, [name]: value }));
+    setFormData((prev: F_UserRegister) => ({ ...prev, [name]: value }));
   };
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+    try {
+      event.preventDefault();
 
-    const responseValidate = await registerServices.validator(dataForm);
-    setError({ ...responseValidate });
+      const responseValidate = registerServices.validator(dataForm);
+      setErrors({ ...responseValidate });
 
-    if (responseValidate.isError) {
-      return;
-    }
+      if (responseValidate.isError) {
+        return;
+      }
 
-    const registerResponse = await registerServices.register(dataForm);
-    if (registerResponse) {
-      navigate('/login');
+      const registerResponse = await registerServices.register(dataForm);
+
+      if (registerResponse) {
+        toast.success('Register Success', {
+          autoClose: 1000,
+        });
+
+        setTimeout(() => {
+          navigate('/login');
+        }, 3000);
+      }
+    } catch (error) {
+      const newError = error as Res_Err_User_Register;
+      toast.error(newError.message, {
+        autoClose: 1000,
+      });
     }
   };
 
   return (
     <div>
+      <ToastContainer />
       <PageHero title="Sign Up" />
       <Box
         sx={{
@@ -74,12 +86,12 @@ export default function Register() {
             margin="normal"
             required
             id="User Name"
-            name="userName"
+            name="user_name"
             label="User Name"
             fullWidth
             onChange={handleChange}
-            error={error.isError && error.msgUserName.length > 0}
-            helperText={error.msgUserName}
+            error={errors.msgUserName.length > 0}
+            helperText={errors.msgUserName}
           />
           <TextField
             margin="normal"
@@ -90,20 +102,10 @@ export default function Register() {
             name="email"
             fullWidth
             onChange={handleChange}
-            error={error.isError && error.msgEmail.length > 0}
-            helperText={error.msgEmail}
+            error={errors.msgEmail.length > 0}
+            helperText={errors.msgEmail}
           />
-          <TextField
-            margin="normal"
-            required
-            id="fullName"
-            label="Full Name"
-            name="fullName"
-            fullWidth
-            onChange={handleChange}
-            error={error.isError && error.msgFullName.length > 0}
-            helperText={error.msgFullName}
-          />
+
           <TextField
             margin="normal"
             required
@@ -113,8 +115,8 @@ export default function Register() {
             name="password"
             fullWidth
             onChange={handleChange}
-            error={error.isError && error.msgPassword.length > 0}
-            helperText={error.msgPassword}
+            error={errors.msgPassword.length > 0}
+            helperText={errors.msgPassword}
           />
           <TextField
             margin="normal"
@@ -122,33 +124,11 @@ export default function Register() {
             id="Confirm Password"
             label="Confirm Password"
             type="password"
-            name="repeatPassword"
+            name="confirm_password"
             fullWidth
             onChange={handleChange}
-            error={error.isError && error.msgPasswordConfirm.length > 0}
-            helperText={error.msgPasswordConfirm}
-          />
-          <TextField
-            margin="normal"
-            required
-            id="phone"
-            label="Phone"
-            name="phone"
-            fullWidth
-            onChange={handleChange}
-            error={error.isError && error.msgPhone.length > 0}
-            helperText={error.msgPhone}
-          />
-          <TextField
-            margin="normal"
-            required
-            id="address"
-            label="Address"
-            name="address"
-            fullWidth
-            onChange={handleChange}
-            error={error.isError && error.msgAddress.length > 0}
-            helperText={error.msgAddress}
+            error={errors.msgPasswordConfirm.length > 0}
+            helperText={errors.msgPasswordConfirm}
           />
 
           <Button

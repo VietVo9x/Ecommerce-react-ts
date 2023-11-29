@@ -1,8 +1,8 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { UserReduxEntity } from '../../types/login.response';
+import { Res_UserInfoLogin } from '../../types/response.type';
 export interface I_authState {
   isLogin: boolean;
-  user: undefined | UserReduxEntity;
+  user: undefined | Res_UserInfoLogin;
 }
 const initialState = {
   isLogin: false,
@@ -12,9 +12,13 @@ const authSlice = createSlice({
   name: 'auth',
   initialState: initialState,
   reducers: {
-    login: (state: I_authState, action: PayloadAction<UserReduxEntity>) => {
+    loginSuccess: (state: I_authState, action: PayloadAction<Res_UserInfoLogin>) => {
       state.user = action.payload;
       state.isLogin = true;
+    },
+    loginfailed: (state: I_authState, action: PayloadAction<undefined>) => {
+      state.user = action.payload;
+      state.isLogin = false;
     },
     logout: (state: I_authState, action: PayloadAction) => {
       state.user = undefined;
@@ -22,5 +26,5 @@ const authSlice = createSlice({
     },
   },
 });
-export const { login, logout } = authSlice.actions;
+export const { loginSuccess, logout } = authSlice.actions;
 export default authSlice.reducer;

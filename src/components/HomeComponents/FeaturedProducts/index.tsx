@@ -11,13 +11,12 @@ import Tooltip from '@mui/material/Tooltip';
 import './style.scss';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../../redux/store/configureStore';
+// import { RootState } from '../../../redux/store/configureStore';
 import { useEffect, useState } from 'react';
-import { I_product } from '../../../types/ProductsType';
 
 export default function FeaturedProducts() {
-  const products = useSelector((state: RootState) => state.products.data);
-  const [listData, setListData] = useState<I_product[]>([]);
+  const products = useSelector((state: any) => state.products.data);
+  const [listData, setListData] = useState<any[]>([]);
 
   const [value, setValue] = React.useState('new');
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
@@ -30,7 +29,7 @@ export default function FeaturedProducts() {
   };
   useEffect(() => {
     if (products && (value == 'new' || value == 'bestSelling' || value == 'bestDeal')) {
-      const newData = products.filter((product) => product[value]);
+      const newData = products.filter((product: any) => product[value]);
       setListData(newData);
     }
   }, [value]);

@@ -10,15 +10,15 @@ import { FaShoppingCart, FaUserPlus, FaBars, FaWindowClose } from 'react-icons/f
 import { links } from '../../routes';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux/es/exports';
-import { I_authState, logout } from '../../redux/slice/AuthSlice';
-import { RootState } from '../../redux/store/configureStore';
-import { I_productUser } from '../../types/ProductsType';
+// import { I_authState, logout } from '../../redux/slice/AuthSlice';
+// import { RootState } from '../../redux/store/configureStore';
+
 export default function Header() {
   const [showNavMobile, setShowNavMobile] = useState(false);
   const auth: {
     isLogin: boolean;
     user: any;
-  } = useSelector((state: RootState) => state.auth);
+  } = useSelector((state: any) => state.auth);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -34,18 +34,18 @@ export default function Header() {
   // Mui menu account end
 
   //check so luong san pham trong cart
-  let totalQuantity = 0;
-  if (auth.user !== undefined) {
-    console.log(auth.user.cart);
-    auth.user.cart.forEach(function (product: I_productUser) {
-      totalQuantity += product.quantity;
-    });
-  }
+  // let totalQuantity = 0;
+  // if (auth.user !== undefined) {
+  //   console.log(auth.user.cart);
+  //   auth.user.cart.forEach(function (product: any) {
+  //     totalQuantity += product.quantity;
+  //   });
+  // }
 
   const handleLogout = async () => {
     handleClose();
     localStorage.removeItem('userLogin');
-    dispatch(logout());
+
     navigate('/login');
   };
 
@@ -86,7 +86,7 @@ export default function Header() {
               Cart
               <span className="nav__btns--cart-icon">
                 <FaShoppingCart />
-                <span>{totalQuantity}</span>
+                <span>0</span>
               </span>
             </Link>
             {auth.isLogin ? (
@@ -129,7 +129,7 @@ export default function Header() {
             Cart
             <span className="nav__btns--cart-icon">
               <FaShoppingCart />
-              <span>{totalQuantity}</span>
+              <span>0</span>
             </span>
           </Link>
           {auth.isLogin ? (

@@ -2,72 +2,92 @@ import { Button } from '@mui/material';
 import PageHero from '../../components/PageHero';
 import './style.scss';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../redux/store/configureStore';
-import { I_productUser } from '../../types/ProductsType';
 import { CartServices } from './CartServices';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Link } from 'react-router-dom';
-import Auth from '../../utils/Auth';
-import { login } from '../../redux/slice/AuthSlice';
+import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Res_Cart } from '../../types/response.type';
+// import { login } from '../../redux/slice/AuthSlice';
 export default function Cart() {
+  const [cart, setCart] = useState<Res_Cart[]>([]);
   const cartServices = new CartServices();
-  const auth: {
-    isLogin: boolean;
-    user: any;
-  } = useSelector((state: RootState) => state.auth);
-  const dispatch = useDispatch();
-  let totalPriceOrder = 0;
-  if (auth.user !== undefined) {
-    auth.user.cart.forEach(function (product: I_productUser) {
-      totalPriceOrder += product.quantity * Number(product.unit_price);
-    });
-  }
+  const navigate = useNavigate();
   //tang giam so luong
-  const handleUpdateQty = async (condition: 'up' | 'down', id: string, qty: number) => {
-    const response = await cartServices.updateProductUser({ id, user: auth?.user, condition });
-    if (response.id) {
-      Auth().then((res) => {
-        if (res) {
-          dispatch(login(res));
-        }
-      });
+  const handleUpdateQty = async (condition: 'up' | 'down', id: number, qty: number) => {
+    const cartUpdate = {
+      id: id,
+      quantity: qty,
+    };
+    if (condition === 'up') {
+      cartUpdate.quantity = qty + 1;
+      cartServices
+        .updateProductCart(id, cartUpdate)
+        .then((res) => {
+          if (res) {
+            const updatedCart = cart.map((item) =>
+              item.id === id ? { ...item, quantity: res.data.quantity } : item,
+            );
+            setCart(updatedCart);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else if (condition === 'down') {
+      cartUpdate.quantity = qty - 1;
+      cartServices
+        .updateProductCart(id, cartUpdate)
+        .then((res) => {
+          if (res) {
+            const updatedCart = cart.map((item) =>
+              item.id === id ? { ...item, quantity: res.data.quantity } : item,
+            );
+            setCart(updatedCart);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
   };
+
   // xoa 1 product
-  const handleDelete = async (id: string) => {
-    const conf = window.confirm('Are you sure you want to delete');
-    if (!conf) return;
-    const response = await cartServices.deleteProduct({ id, user: auth?.user });
-    if (response.id) {
-      Auth().then((res) => {
-        if (res) {
-          dispatch(login(res));
-        }
-      });
-    }
+  const handleDelete = async (id: number) => {
+    cartServices.deleteProductCart(id).then((res) => {
+      const updatedCart = cart.filter((item) => item.id !== id);
+      setCart(updatedCart);
+    });
   };
   //clear cart
   const handleClearCart = async () => {
-    const conf = window.confirm('Are you sure you want to clear your cart');
-    if (!conf) return;
-    if (auth.user !== undefined) {
-      const id = auth.user.id;
-      const user = auth.user;
-      const response = await cartServices.deleteCart(id, user);
-      if (response) {
-        Auth().then((res) => {
-          if (res) {
-            dispatch(login(res));
-          }
-        });
-      }
-    }
+    cartServices.clearCart().then((res) => {
+      setCart([]);
+    });
   };
+  const totalPriceCart = (cart: Res_Cart[]) => {
+    let totalPrice = 0;
+    // eslint-disable-next-line array-callback-return
+    cart.map((item) => {
+      totalPrice += item.quantity * item.product.price;
+    });
+    return totalPrice;
+  };
+
+  useEffect(() => {
+    cartServices
+      .getCart()
+      .then((res) => {
+        setCart(res?.data);
+      })
+      .catch((error) => {
+        navigate('/login');
+      });
+  }, []);
   return (
     <div>
       <PageHero title="Cart" />
 
-      {auth.user !== undefined && auth.user.cart.length > 0 ? (
+      {cart && cart.length > 0 ? (
         <section className="cart">
           <table className="cart__table">
             <thead>
@@ -81,37 +101,38 @@ export default function Cart() {
               </tr>
             </thead>
             <tbody>
-              {auth.user.cart.map((item: I_productUser, index: number) => (
-                <tr key={index}>
-                  <td>
-                    <img src={item.image} alt="" />
-                  </td>
-                  <td>{item.product_name}</td>
-                  <td>$ {item.unit_price}.00</td>
-                  <td className="cart__table--value">
-                    <Button
-                      variant="text"
-                      onClick={() => handleUpdateQty('down', item.id, item.quantity)}
-                      disabled={item.quantity === 1}
-                    >
-                      <span>-</span>
-                    </Button>
-                    <h2>{item.quantity}</h2>
-                    <Button
-                      variant="text"
-                      onClick={() => handleUpdateQty('up', item.id, item.quantity)}
-                    >
-                      <span>+</span>
-                    </Button>
-                  </td>
-                  <td>$ {item.quantity * Number(item.unit_price)}.00</td>
-                  <td>
-                    <Button variant="text" color="error" onClick={() => handleDelete(item.id)}>
-                      <DeleteIcon />
-                    </Button>
-                  </td>
-                </tr>
-              ))}
+              {cart &&
+                cart.map((item: Res_Cart, index: number) => (
+                  <tr key={index}>
+                    <td>
+                      <img src={item.product.imageProducts[0].image_url} alt="" />
+                    </td>
+                    <td>{item.product.product_name}</td>
+                    <td>$ {item.product.price}.00</td>
+                    <td className="cart__table--value">
+                      <Button
+                        variant="text"
+                        onClick={() => handleUpdateQty('down', item.id, item.quantity)}
+                        disabled={item.quantity === 1}
+                      >
+                        <span>-</span>
+                      </Button>
+                      <h2>{item.quantity}</h2>
+                      <Button
+                        variant="text"
+                        onClick={() => handleUpdateQty('up', item.id, item.quantity)}
+                      >
+                        <span>+</span>
+                      </Button>
+                    </td>
+                    <td>$ {item.quantity * item.product.price}.00</td>
+                    <td>
+                      <Button variant="text" color="error" onClick={() => handleDelete(item.id)}>
+                        <DeleteIcon />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
           <div className="cart__btns">
@@ -123,23 +144,23 @@ export default function Cart() {
             </Button>
           </div>
           <div className="cart__checkout">
-            <h5
+            {/* <h5
               className="
           cart__checkout--item"
             >
-              Subtotal : <span>$ {Math.floor(totalPriceOrder)}.00</span>
+              Subtotal : <span>$ 100.00</span>
             </h5>
             <p
               className="
           cart__checkout--item"
             >
               Shipping Fee : <span>$ 5.34</span>
-            </p>
+            </p> */}
             <h4
               className="
           cart__checkout--item"
             >
-              Order Total : <span>$ {Math.floor(totalPriceOrder - 5.34)}.00</span>
+              Order Total : <span>$ {totalPriceCart(cart)}.00</span>
             </h4>
             <div className="cart__checkout--btn">
               <Button variant="contained" color="success" fullWidth>

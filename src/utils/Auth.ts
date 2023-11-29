@@ -1,13 +1,16 @@
-import { UserEntities } from './../Entities/index';
 import { getData } from './DB';
+import { _VERIFY_TOKEN } from './constantAPI';
 
-export default async function Auth() {
-  const auth = localStorage.getItem('userLogin');
-  if (auth) {
-    const userLocal = JSON.parse(auth);
-    const users = await getData('users');
-    const user = users.find((user: UserEntities) => user.id === userLocal.id);
-    console.log(user);
-    return user;
+const Auth = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const user = await getData(_VERIFY_TOKEN);
+      console.log(user);
+      return user;
+    }
+  } catch (error) {
+    throw error;
   }
-}
+};
+export { Auth };
