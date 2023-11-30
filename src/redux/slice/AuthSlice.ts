@@ -2,11 +2,11 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { Res_UserInfoLogin } from '../../types/response.type';
 export interface I_authState {
   isLogin: boolean;
-  user: undefined | Res_UserInfoLogin;
+  user: Res_UserInfoLogin | null;
 }
 const initialState = {
   isLogin: false,
-  user: undefined,
+  user: null,
 };
 const authSlice = createSlice({
   name: 'auth',
@@ -16,12 +16,8 @@ const authSlice = createSlice({
       state.user = action.payload;
       state.isLogin = true;
     },
-    loginfailed: (state: I_authState, action: PayloadAction<undefined>) => {
-      state.user = action.payload;
-      state.isLogin = false;
-    },
-    logout: (state: I_authState, action: PayloadAction) => {
-      state.user = undefined;
+    logout: (state: I_authState) => {
+      state.user = null;
       state.isLogin = false;
     },
   },

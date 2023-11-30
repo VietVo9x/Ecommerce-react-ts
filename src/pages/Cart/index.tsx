@@ -1,15 +1,21 @@
 import { Button } from '@mui/material';
 import PageHero from '../../components/PageHero';
 import './style.scss';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { CartServices } from './CartServices';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Res_Cart } from '../../types/response.type';
-// import { login } from '../../redux/slice/AuthSlice';
+import {
+  calculateTotalQuantity,
+  formatNumberToLocaleString,
+  totalPriceCart,
+} from '../../utils/constant';
+import { setTotalCart } from '../../redux/slice/CartSlice';
 export default function Cart() {
   const [cart, setCart] = useState<Res_Cart[]>([]);
+  const dispatch = useDispatch();
   const cartServices = new CartServices();
   const navigate = useNavigate();
   //tang giam so luong
@@ -27,6 +33,9 @@ export default function Cart() {
             const updatedCart = cart.map((item) =>
               item.id === id ? { ...item, quantity: res.data.quantity } : item,
             );
+            const totalQuantity = calculateTotalQuantity(updatedCart);
+            dispatch(setTotalCart(totalQuantity));
+
             setCart(updatedCart);
           }
         })
@@ -42,6 +51,8 @@ export default function Cart() {
             const updatedCart = cart.map((item) =>
               item.id === id ? { ...item, quantity: res.data.quantity } : item,
             );
+            const totalQuantity = calculateTotalQuantity(updatedCart);
+            dispatch(setTotalCart(totalQuantity));
             setCart(updatedCart);
           }
         })
@@ -53,24 +64,33 @@ export default function Cart() {
 
   // xoa 1 product
   const handleDelete = async (id: number) => {
-    cartServices.deleteProductCart(id).then((res) => {
+    const isDelete = window.confirm('Are you sure you want to delete this product?');
+    if (!isDelete) return;
+
+    try {
+      await cartServices.deleteProductCart(id);
       const updatedCart = cart.filter((item) => item.id !== id);
+      const totalQuantity = calculateTotalQuantity(updatedCart);
+      dispatch(setTotalCart(totalQuantity));
       setCart(updatedCart);
-    });
+    } catch (error) {
+      console.error('Failed to delete product:', error);
+    }
   };
   //clear cart
   const handleClearCart = async () => {
-    cartServices.clearCart().then((res) => {
+    const isClearCart = window.confirm('Are you sure you want to clear the cart?');
+    if (!isClearCart) return;
+
+    try {
+      await cartServices.clearCart();
+      const totalQuantity = calculateTotalQuantity([]);
+      dispatch(setTotalCart(totalQuantity));
+
       setCart([]);
-    });
-  };
-  const totalPriceCart = (cart: Res_Cart[]) => {
-    let totalPrice = 0;
-    // eslint-disable-next-line array-callback-return
-    cart.map((item) => {
-      totalPrice += item.quantity * item.product.price;
-    });
-    return totalPrice;
+    } catch (error) {
+      console.error('Failed to clear cart:', error);
+    }
   };
 
   useEffect(() => {
@@ -108,7 +128,7 @@ export default function Cart() {
                       <img src={item.product.imageProducts[0].image_url} alt="" />
                     </td>
                     <td>{item.product.product_name}</td>
-                    <td>$ {item.product.price}.00</td>
+                    <td>$ {formatNumberToLocaleString(item.product.price)}</td>
                     <td className="cart__table--value">
                       <Button
                         variant="text"
@@ -125,7 +145,7 @@ export default function Cart() {
                         <span>+</span>
                       </Button>
                     </td>
-                    <td>$ {item.quantity * item.product.price}.00</td>
+                    <td>$ {formatNumberToLocaleString(item.quantity * item.product.price)}</td>
                     <td>
                       <Button variant="text" color="error" onClick={() => handleDelete(item.id)}>
                         <DeleteIcon />
@@ -160,7 +180,7 @@ export default function Cart() {
               className="
           cart__checkout--item"
             >
-              Order Total : <span>$ {totalPriceCart(cart)}.00</span>
+              Order Total : <span>$ {formatNumberToLocaleString(totalPriceCart(cart))}</span>
             </h4>
             <div className="cart__checkout--btn">
               <Button variant="contained" color="success" fullWidth>

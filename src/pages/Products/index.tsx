@@ -23,7 +23,7 @@ import { getData } from '../../utils/DB';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { _CATEGORY, _PRODUCT } from '../../utils/constantAPI';
 import { Res_Category, Res_Product } from '../../types/response.type';
-import { perPage } from '../../utils/constant';
+import { formatNumberToLocaleString, perPage } from '../../utils/constant';
 export default function Products() {
   const [categorys, setCategorys] = useState<Res_Category[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -67,21 +67,12 @@ export default function Products() {
   }, []);
   //data products
   useEffect(() => {
-    if (cate === '') {
-      getData(
-        `${_PRODUCT}?page=${page}&limit=${perPage}&name=${search}&sort=${sortValue}&order=${sortOrder}`,
-      ).then((res) => {
-        setCount(Math.ceil(Number(res?.headers['x-total-products']) / perPage));
-        setProducts([...res?.data]);
-      });
-    } else {
-      // Gọi lại API và cập nhật count khi cate thay đổi
-      getData(
-        `/product?page=${page}&limit=${perPage}&name=${search}&category=${cate}&sort=${sortValue}&order=${sortOrder}`,
-      ).then((res) => {
-        setProducts([...res?.data]);
-      });
-    }
+    getData(
+      `/product?page=${page}&limit=${perPage}&name=${search}&category=${cate}&sort=${sortValue}&order=${sortOrder}`,
+    ).then((res) => {
+      setCount(Math.ceil(Number(res?.headers['x-total-products']) / perPage));
+      setProducts([...res?.data]);
+    });
   }, [page, search, cate, sortValue, sortOrder]);
 
   const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -201,7 +192,7 @@ export default function Products() {
 
                   <div className="products--content__item--action">
                     <div className="products--content__item--price">
-                      <p>$ {product.price}.00</p>
+                      <p>$ {formatNumberToLocaleString(product.price)}</p>
                     </div>
 
                     <Tooltip

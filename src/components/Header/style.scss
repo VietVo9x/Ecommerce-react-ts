@@ -1,11 +1,14 @@
 .nav {
-  width: 1200px;
-  max-width: 100%;
+  width: 100%;
   margin: 0 auto;
   padding: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: #fff;
+  border-bottom: 3px solid var(--primary-color);
+  position: fixed;
+  z-index: 1000;
   &__logo {
     & > a {
       font-size: 32px;
@@ -29,9 +32,9 @@
     display: flex;
     li {
       a {
-        font-size: 16px;
+        font-size: 20px;
         color: var(--text-color);
-        padding: 6px 16px;
+        padding: 6px 24px;
         &:hover {
           border-bottom: 1px solid var(--primary-color);
         }

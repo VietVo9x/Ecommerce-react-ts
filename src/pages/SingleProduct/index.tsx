@@ -15,6 +15,8 @@ import { SingleProductServices } from './SingleProductServices';
 import PageHero from '../../components/PageHero';
 import { Res_Product } from '../../types/response.type';
 import { logout } from '../../redux/slice/AuthSlice';
+import { calculateTotalQuantity, formatNumberToLocaleString } from '../../utils/constant';
+import { setTotalCart } from '../../redux/slice/CartSlice';
 
 export default function SingleProduct() {
   const singleProductService = new SingleProductServices();
@@ -65,9 +67,12 @@ export default function SingleProduct() {
         quantity: quantityInput,
       };
       const insertProductCart = await singleProductService.createCart(productCart);
-      if (insertProductCart) {
-        toast.success(`Successfully added ${quantityInput} products`, { autoClose: 1000 });
-      }
+
+      const totalQuantity = calculateTotalQuantity(insertProductCart?.data);
+      dispatch(setTotalCart(totalQuantity));
+      toast.success('Product added successfully', {
+        autoClose: 1000,
+      });
     } catch (error) {
       toast.error('Please log in to purchase', {
         autoClose: 1000,
@@ -117,7 +122,7 @@ export default function SingleProduct() {
               <span>(100 customer reviews)</span>
             </div>
             <Typography component={'h5'} variant="h4" pt={2}>
-              $ {product?.price}.00
+              $ {formatNumberToLocaleString(product?.price)}
             </Typography>
             <p className="product__content--desc"> {product?.description}</p>
             <p className="product__content--info">

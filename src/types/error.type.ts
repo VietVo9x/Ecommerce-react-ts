@@ -10,3 +10,11 @@ export interface Err_UserLogin {
   msgEmail: string;
   msgPassword: string;
 }
+export interface Err_Checkout_AddressForm {
+  isError: boolean;
+  msgFullName: string;
+  msgAddress: string;
+  msgPhone: string;
+  msgProvince: string;
+  msgCity: string;
+}

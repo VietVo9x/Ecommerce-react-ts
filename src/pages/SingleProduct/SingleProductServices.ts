@@ -1,4 +1,4 @@
-import { F_ProductCart } from '../../types/form.type';
+import { Req_ProductCart } from '../../types/request.type';
 import { getDataForID, insertData } from '../../utils/DB';
 import { _CART_CREATE, _PRODUCT } from '../../utils/constantAPI';
 
@@ -11,7 +11,7 @@ export class SingleProductServices {
       throw error;
     }
   }
-  async createCart(product: F_ProductCart) {
+  async createCart(product: Req_ProductCart) {
     try {
       return await insertData(_CART_CREATE, product);
     } catch (error) {

@@ -8,19 +8,22 @@ import Typography from '@mui/material/Typography';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { LoginServices } from './LoginServices';
-import { F_UserLogin } from '../../../types/form.type';
+import { Req_UserLogin } from '../../../types/request.type';
 import { Err_UserLogin } from '../../../types/error.type';
 import { ToastContainer, toast } from 'react-toastify';
 import { Res_Err_User_Login } from '../../../types/error.res';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginSuccess } from '../../../redux/slice/AuthSlice';
 import axios, { AxiosError } from 'axios';
+import { Res_Cart } from '../../../types/response.type';
+import { setTotalCart } from '../../../redux/slice/CartSlice';
+import { calculateTotalQuantity } from '../../../utils/constant';
 
 export default function Login() {
   const navigate = useNavigate();
   const loginServices = new LoginServices();
   const dispatch = useDispatch();
-  const [dataForm, setDataForm] = useState<F_UserLogin>({
+  const [dataForm, setDataForm] = useState<Req_UserLogin>({
     email: '',
     password: '',
   });
@@ -43,6 +46,15 @@ export default function Login() {
       toast.success('Login successful', {
         autoClose: 1000,
       });
+
+      // Gọi API để lấy thông tin giỏ hàng sau khi đăng nhập thành công
+      const cartResponse = await loginServices.getCart(); // Thay đổi đường dẫn API tương ứng của bạn
+      if (cartResponse && Array.isArray(cartResponse.data)) {
+        const cartData = cartResponse.data;
+        const totalQuantity = calculateTotalQuantity(cartData);
+        dispatch(setTotalCart(totalQuantity));
+      }
+
       setTimeout(() => {
         navigate('/');
       }, 1000);

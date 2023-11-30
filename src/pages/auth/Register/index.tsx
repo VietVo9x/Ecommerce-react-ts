@@ -8,7 +8,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import './style.scss';
 import RegisterServices from './RegisterServices';
-import { F_UserRegister } from '../../../types/form.type';
+import { Req_UserRegister } from '../../../types/request.type';
 import { Err_UserRegister } from '../../../types/error.type';
 import { Res_Err_User_Register } from '../../../types/error.res';
 import { ToastContainer, toast } from 'react-toastify';
@@ -16,7 +16,7 @@ import { ToastContainer, toast } from 'react-toastify';
 export default function Register() {
   const navigate = useNavigate();
   const registerServices = new RegisterServices();
-  const [dataForm, setFormData] = useState<F_UserRegister>({
+  const [dataForm, setFormData] = useState<Req_UserRegister>({
     email: '',
     user_name: '',
     password: '',
@@ -33,7 +33,7 @@ export default function Register() {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
     const value = event.target.value;
-    setFormData((prev: F_UserRegister) => ({ ...prev, [name]: value }));
+    setFormData((prev: Req_UserRegister) => ({ ...prev, [name]: value }));
   };
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     try {

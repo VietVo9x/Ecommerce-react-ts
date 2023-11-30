@@ -1,9 +1,9 @@
-import { F_UserRegister } from '../../../types/form.type';
+import { Req_UserRegister } from '../../../types/request.type';
 import { insertData } from '../../../utils/DB';
 import { _USER_REGISTER } from '../../../utils/constantAPI';
 
 export default class RegisterServices {
-  register(dataForm: F_UserRegister) {
+  register(dataForm: Req_UserRegister) {
     try {
       const createUser = insertData(_USER_REGISTER, dataForm);
       return createUser;
@@ -12,7 +12,7 @@ export default class RegisterServices {
     }
   }
 
-  validator(dataForm: F_UserRegister) {
+  validator(dataForm: Req_UserRegister) {
     const error = {
       isError: false,
       msgEmail: '',

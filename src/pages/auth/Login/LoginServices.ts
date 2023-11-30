@@ -1,9 +1,8 @@
-import { AxiosError } from 'axios';
-import { F_UserLogin } from '../../../types/form.type';
+import { Req_UserLogin } from '../../../types/request.type';
 import { getData, insertData } from '../../../utils/DB';
-import { _USER_LOGIN, _VERIFY_TOKEN } from '../../../utils/constantAPI';
+import { _CART, _USER_LOGIN, _VERIFY_TOKEN } from '../../../utils/constantAPI';
 export class LoginServices {
-  async onLogin(dataForm: F_UserLogin) {
+  async onLogin(dataForm: Req_UserLogin) {
     try {
       const userLogin = await insertData(_USER_LOGIN, dataForm);
       localStorage.setItem('token', userLogin?.headers.authorization);
@@ -12,8 +11,16 @@ export class LoginServices {
       throw error;
     }
   }
+  async getCart() {
+    try {
+      const cart = await getData(_CART);
+      return cart;
+    } catch (error) {
+      throw error;
+    }
+  }
 
-  async validator(dataForm: F_UserLogin) {
+  async validator(dataForm: Req_UserLogin) {
     const error = {
       isError: false,
       msgEmail: '',

@@ -10,16 +10,20 @@ import { FaShoppingCart, FaUserPlus, FaBars, FaWindowClose } from 'react-icons/f
 import { links } from '../../routes';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux/es/exports';
+import { logout } from '../../redux/slice/AuthSlice';
+import { RootState } from '../../redux/store/configureStore';
+import { Res_UserInfoLogin } from '../../types/response.type';
+import { setTotalCart } from '../../redux/slice/CartSlice';
 // import { I_authState, logout } from '../../redux/slice/AuthSlice';
 // import { RootState } from '../../redux/store/configureStore';
 
 export default function Header() {
   const [showNavMobile, setShowNavMobile] = useState(false);
-  const auth: {
-    isLogin: boolean;
-    user: any;
-  } = useSelector((state: any) => state.auth);
-
+  const isLogin = useSelector((state: RootState) => state.auth.isLogin);
+  const user = useSelector(
+    (state: { auth: { user: Res_UserInfoLogin | null } }) => state.auth.user,
+  );
+  const quantityCart = useSelector((state: RootState) => state.cart.quantity);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   // Mui menu account start
@@ -31,21 +35,12 @@ export default function Header() {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  // Mui menu account end
-
-  //check so luong san pham trong cart
-  // let totalQuantity = 0;
-  // if (auth.user !== undefined) {
-  //   console.log(auth.user.cart);
-  //   auth.user.cart.forEach(function (product: any) {
-  //     totalQuantity += product.quantity;
-  //   });
-  // }
 
   const handleLogout = async () => {
     handleClose();
-    localStorage.removeItem('userLogin');
-
+    localStorage.removeItem('token');
+    dispatch(logout());
+    dispatch(setTotalCart(0));
     navigate('/login');
   };
 
@@ -89,7 +84,7 @@ export default function Header() {
                 <span>0</span>
               </span>
             </Link>
-            {auth.isLogin ? (
+            {isLogin ? (
               <>
                 <Link
                   to="/account"
@@ -129,10 +124,10 @@ export default function Header() {
             Cart
             <span className="nav__btns--cart-icon">
               <FaShoppingCart />
-              <span>0</span>
+              <span>{quantityCart}</span>
             </span>
           </Link>
-          {auth.isLogin ? (
+          {isLogin ? (
             <div>
               <Button
                 variant="contained"
@@ -143,7 +138,7 @@ export default function Header() {
                 aria-expanded={open ? 'true' : undefined}
                 onClick={handleClick}
               >
-                Hello ,{auth.user?.userName}
+                Hello ,{user && user?.user_name}
               </Button>
               <Menu
                 id="basic-menu"

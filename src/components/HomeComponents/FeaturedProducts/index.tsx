@@ -13,10 +13,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 // import { RootState } from '../../../redux/store/configureStore';
 import { useEffect, useState } from 'react';
+import { Res_Product } from '../../../types/response.type';
+import { getData } from '../../../utils/DB';
+import { perPage } from '../../../utils/constant';
 
 export default function FeaturedProducts() {
-  const products = useSelector((state: any) => state.products.data);
-  const [listData, setListData] = useState<any[]>([]);
+  const [products, setProducts] = useState<Res_Product[]>([]);
+  const sortValue = 'created_at';
+  const sortOrder = 'DESC';
 
   const [value, setValue] = React.useState('new');
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
@@ -24,15 +28,16 @@ export default function FeaturedProducts() {
   };
   //handle view
   const navigate = useNavigate();
-  const handleView = (id: string) => {
+  const handleView = (id: number) => {
     navigate('/products/' + id);
   };
   useEffect(() => {
-    if (products && (value == 'new' || value == 'bestSelling' || value == 'bestDeal')) {
-      const newData = products.filter((product: any) => product[value]);
-      setListData(newData);
-    }
-  }, [value]);
+    getData(`/product?limit=8&sort=${sortValue}&order=${sortOrder}`)
+      .then((res) => {
+        if (res) setProducts(res.data);
+      })
+      .catch((err) => console.log(err));
+  }, []);
 
   return (
     <section className="featured-product--wrapper">
@@ -52,72 +57,20 @@ export default function FeaturedProducts() {
               aria-label="secondary tabs example"
             >
               <Tab label="New Product" value="new" />
-              <Tab label="Best Deal" value="bestDeal" />
-              <Tab label="Best Selling" value="bestSelling" />
             </Tabs>
           </Box>
           <TabPanel value="new">
             <div className="featured-product">
-              {listData.map((element, index) => (
+              {products.map((element, index) => (
                 <div className="featured-product__item" key={index}>
                   <div className="featured-product__item--image">
-                    <img src={element.image} alt={element.product_name} />
+                    <img src={element.imageProducts[0].image_url} alt={element.product_name} />
                   </div>
                   <h5 className="featured-product__item--title">{element.product_name}</h5>
 
                   <div className="featured-product__item--actions">
                     <div className="featured-product__item--price">
-                      <p>$ {element.unit_price}.00</p>
-                    </div>
-
-                    <Tooltip title="Add to cart" placement="top">
-                      <Button onClick={() => handleView(element.id)}>
-                        {' '}
-                        <ShoppingCartOutlinedIcon />
-                      </Button>
-                    </Tooltip>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </TabPanel>
-          <TabPanel value="bestDeal">
-            <div className="featured-product">
-              {listData.map((element, index) => (
-                <div className="featured-product__item" key={index}>
-                  <div className="featured-product__item--image">
-                    <img src={element.image} alt={element.product_name} />
-                  </div>
-                  <h5 className="featured-product__item--title">{element.product_name}</h5>
-
-                  <div className="featured-product__item--actions">
-                    <div className="featured-product__item--price">
-                      <p>$ {element.unit_price}.00</p>
-                    </div>
-
-                    <Tooltip title="Add to cart" placement="top">
-                      <Button onClick={() => handleView(element.id)}>
-                        {' '}
-                        <ShoppingCartOutlinedIcon />
-                      </Button>
-                    </Tooltip>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </TabPanel>
-          <TabPanel value="bestSelling">
-            <div className="featured-product">
-              {listData.map((element, index) => (
-                <div className="featured-product__item" key={index}>
-                  <div className="featured-product__item--image">
-                    <img src={element.image} alt={element.product_name} />
-                  </div>
-                  <h5 className="featured-product__item--title">{element.product_name}</h5>
-
-                  <div className="featured-product__item--actions">
-                    <div className="featured-product__item--price">
-                      <p>$ {element.unit_price}.00</p>
+                      <p>$ {element.price}.00</p>
                     </div>
 
                     <Tooltip title="Add to cart" placement="top">
