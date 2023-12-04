@@ -7,16 +7,14 @@ import SendIcon from '@mui/icons-material/Send';
 import Typography from '@mui/material/Typography';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { LoginServices } from './LoginServices';
+import { LoginServices } from './login.service';
 import { Req_UserLogin } from '../../../types/request.type';
 import { Err_UserLogin } from '../../../types/error.type';
 import { ToastContainer, toast } from 'react-toastify';
 import { Res_Err_User_Login } from '../../../types/error.res';
-import { useDispatch, useSelector } from 'react-redux';
-import { loginSuccess } from '../../../redux/slice/AuthSlice';
-import axios, { AxiosError } from 'axios';
-import { Res_Cart } from '../../../types/response.type';
-import { setTotalCart } from '../../../redux/slice/CartSlice';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../../../redux/slice/auth.slice';
+import { setTotalCart } from '../../../redux/slice/cart.slice';
 import { calculateTotalQuantity } from '../../../utils/constant';
 
 export default function Login() {
@@ -73,7 +71,6 @@ export default function Login() {
 
   return (
     <div>
-      <ToastContainer />
       <PageHero title="Sign In" />
       <Box
         sx={{
@@ -81,6 +78,7 @@ export default function Login() {
           mx: 4,
         }}
       >
+        <ToastContainer />
         <Box
           component="form"
           noValidate

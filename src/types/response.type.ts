@@ -30,6 +30,7 @@ export interface Res_Product {
   quantity_stock: number;
   description: string;
   category: {
+    id: number;
     category_name: string;
   };
   imageProducts: {

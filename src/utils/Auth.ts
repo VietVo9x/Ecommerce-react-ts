@@ -1,7 +1,7 @@
 import { Res_Cart } from '../types/response.type';
-import { getData } from './DB';
+import { getData } from './api.services';
 import { calculateTotalQuantity } from './constant';
-import { _CART, _VERIFY_TOKEN } from './constantAPI';
+import { _CART, _VERIFY_TOKEN } from './constant.api';
 
 const Auth = async () => {
   try {

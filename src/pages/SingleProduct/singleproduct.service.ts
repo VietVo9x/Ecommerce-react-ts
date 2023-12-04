@@ -1,6 +1,6 @@
 import { Req_ProductCart } from '../../types/request.type';
-import { getDataForID, insertData } from '../../utils/DB';
-import { _CART_CREATE, _PRODUCT } from '../../utils/constantAPI';
+import { getDataForID, insertData } from '../../utils/api.services';
+import { _CART_CREATE, _PRODUCT } from '../../utils/constant.api';
 
 export class SingleProductServices {
   async getProduct(id: string | number) {

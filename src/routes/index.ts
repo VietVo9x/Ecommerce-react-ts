@@ -14,4 +14,9 @@ export const links = [
     link: '/about',
     text: 'About',
   },
+  {
+    id: 4,
+    link: '/contact',
+    text: 'Contact',
+  },
 ];

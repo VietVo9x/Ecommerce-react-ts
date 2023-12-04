@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import './style.scss';
-import RegisterServices from './RegisterServices';
+import RegisterServices from './register.service';
 import { Req_UserRegister } from '../../../types/request.type';
 import { Err_UserRegister } from '../../../types/error.type';
 import { Res_Err_User_Register } from '../../../types/error.res';
@@ -40,7 +40,7 @@ export default function Register() {
       event.preventDefault();
 
       const responseValidate = registerServices.validator(dataForm);
-      setErrors({ ...responseValidate });
+      setErrors(responseValidate);
 
       if (responseValidate.isError) {
         return;

@@ -1,6 +1,6 @@
 import { Req_UserRegister } from '../../../types/request.type';
-import { insertData } from '../../../utils/DB';
-import { _USER_REGISTER } from '../../../utils/constantAPI';
+import { insertData } from '../../../utils/api.services';
+import { _USER_REGISTER } from '../../../utils/constant.api';
 
 export default class RegisterServices {
   register(dataForm: Req_UserRegister) {

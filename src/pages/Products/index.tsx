@@ -19,11 +19,13 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 
 import './style.scss';
 import { useEffect, useState } from 'react';
-import { getData } from '../../utils/DB';
+import { getData } from '../../utils/api.services';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { _CATEGORY, _PRODUCT } from '../../utils/constantAPI';
+import { _CATEGORY, _PRODUCT } from '../../utils/constant.api';
 import { Res_Category, Res_Product } from '../../types/response.type';
 import { formatNumberToLocaleString, perPage } from '../../utils/constant';
+import ScrollToTopButton from '../../components/ScrollToTopButton';
+import CustomizedInputBase from '../../components/InputSearch';
 export default function Products() {
   const [categorys, setCategorys] = useState<Res_Category[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -46,12 +48,8 @@ export default function Products() {
     setCount(() => Math.ceil(products.length / perPage));
   };
 
-  const handleSearch = (e: { target: { value: string } }) => {
-    setSearchValue(e?.target.value);
-    setTimeout(() => {
-      setSearchParams({ ...params, search: e?.target.value, page: '1' });
-      setCount(() => Math.ceil(products.length / perPage));
-    }, 2000);
+  const handleSearch = () => {
+    setSearchParams({ ...params, search: searchValue, page: 1 });
   };
   const clearSearch = () => {
     setSearchParams({ ...params, search: '' });
@@ -68,7 +66,7 @@ export default function Products() {
   //data products
   useEffect(() => {
     getData(
-      `/product?page=${page}&limit=${perPage}&name=${search}&category=${cate}&sort=${sortValue}&order=${sortOrder}`,
+      `/product?page=${page}&limit=${perPage}&search=${search}&category=${cate}&sort=${sortValue}&order=${sortOrder}`,
     ).then((res) => {
       setCount(Math.ceil(Number(res?.headers['x-total-products']) / perPage));
       setProducts([...res?.data]);
@@ -118,24 +116,17 @@ export default function Products() {
   };
   return (
     <div>
+      <ScrollToTopButton />
       <PageHero title="Products" />
       <div className="products">
         <div className="products--side-bar">
           <FormGroup>
-            <Box pb={5} display={'flex'}>
-              <TextField
-                id="outlined-basic"
-                label="Search"
-                variant="outlined"
-                value={searchValue}
-                onChange={(e) => {
-                  handleSearch(e);
-                }}
-              />
-              <Button onClick={clearSearch} variant="contained">
-                Clear
-              </Button>
-            </Box>
+            <CustomizedInputBase
+              onClearSearch={clearSearch}
+              onSearch={handleSearch}
+              searchValue={searchValue}
+              setSearchValue={setSearchValue}
+            />
             <Typography component={'h3'} variant="h5" pb={1} color={'primary'}>
               {' '}
               Category
@@ -174,7 +165,7 @@ export default function Products() {
                 <MenuItem value={1}>Name (A - Z)</MenuItem>
                 <MenuItem value={2}>Name (Z - A)</MenuItem>
                 <MenuItem value={3}>Price(Lowest)</MenuItem>
-                <MenuItem value={4}>Thirty(Highest)</MenuItem>
+                <MenuItem value={4}>Price(Highest)</MenuItem>
               </Select>
             </FormControl>
           </Box>

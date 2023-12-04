@@ -1,6 +1,6 @@
 import { Req_CartUpdate } from '../../types/request.type';
-import { deleteData, getData, updateData } from '../../utils/DB';
-import { _CART, _CART_CLEAR, _CART_DELETE_ITEM, _CART_UPDATE } from '../../utils/constantAPI';
+import { deleteData, getData, updateData } from '../../utils/api.services';
+import { _CART, _CART_CLEAR, _CART_DELETE_ITEM, _CART_UPDATE } from '../../utils/constant.api';
 
 export class CartServices {
   getCart() {

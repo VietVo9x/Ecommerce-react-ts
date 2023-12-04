@@ -11,7 +11,7 @@ export interface Res_Err_User_Login {
     passwordMessage?: string;
   } | null;
 }
-export interface Res_Err_Cart {
+export interface Res_Error {
   message: string;
   errors: null;
 }

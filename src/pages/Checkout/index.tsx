@@ -10,12 +10,17 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import AddressForm from './AddressForm';
 import Review from './Review';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Res_Cart, Res_UserInfoLogin } from '../../types/response.type';
 import PageHero from '../../components/PageHero';
 import { Req_Checkout_Address } from '../../types/request.type';
-import { _CART } from '../../utils/constantAPI';
-import { getData } from '../../utils/DB';
+import { _CART, _ORDER_CREATE } from '../../utils/constant.api';
+import { getData, insertData } from '../../utils/api.services';
+import { Link } from 'react-router-dom';
+import './style.scss';
+import { setTotalCart } from '../../redux/slice/cart.slice';
+import { Res_Error } from '../../types/error.res';
+import { ToastContainer, toast } from 'react-toastify';
 
 const steps = ['Shipping address', 'Review your order'];
 
@@ -23,6 +28,7 @@ export default function Checkout() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [isError, setIsError] = React.useState(true);
   const [cart, setCart] = React.useState<Res_Cart[]>([]);
+  const dispatch = useDispatch();
 
   const user = useSelector(
     (state: { auth: { user: Res_UserInfoLogin | null } }) => state.auth.user,
@@ -51,24 +57,35 @@ export default function Checkout() {
     }
   }
 
-  const handleNext = () => {
+  const handleNext = async () => {
     setActiveStep(activeStep + 1);
+    if (activeStep === 1) {
+      try {
+        await insertData(_ORDER_CREATE, addressForm);
+        dispatch(setTotalCart(0));
+      } catch (error) {
+        const newError = error as Res_Error;
+        toast.error(newError.message, {
+          autoClose: 1000,
+        });
+      }
+    }
   };
 
   const handleBack = () => {
     setActiveStep(activeStep - 1);
   };
-  const handleSubmit = () => {};
+
   React.useEffect(() => {
     getData(_CART).then((res) => {
       if (res) {
-        console.log(res.data);
         setCart(res.data);
       }
     });
   }, []);
   return (
     <React.Fragment>
+      <ToastContainer />
       <React.Fragment>
         <CssBaseline />
         <PageHero title="Checkout" />
@@ -78,8 +95,8 @@ export default function Checkout() {
               Checkout
             </Typography>
             <Stepper activeStep={activeStep} sx={{ pt: 3, pb: 5 }}>
-              {steps.map((label) => (
-                <Step key={label}>
+              {steps.map((label, index) => (
+                <Step key={index}>
                   <StepLabel>{label}</StepLabel>
                 </Step>
               ))}
@@ -89,10 +106,13 @@ export default function Checkout() {
                 <Typography variant="h5" gutterBottom>
                   Thank you for your order.
                 </Typography>
-                <Typography variant="subtitle1">
-                  Your order number is #2001539. We have emailed your order confirmation, and will
-                  send you an update when your order has shipped.
-                </Typography>
+
+                <button>
+                  {' '}
+                  <Link to="/products" className="btn">
+                    BACK TO PRODUCTS
+                  </Link>
+                </button>
               </React.Fragment>
             ) : (
               <React.Fragment>

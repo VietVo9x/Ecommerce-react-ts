@@ -10,12 +10,9 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import './style.scss';
 import { Link, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-// import { RootState } from '../../../redux/store/configureStore';
 import { useEffect, useState } from 'react';
 import { Res_Product } from '../../../types/response.type';
-import { getData } from '../../../utils/DB';
-import { perPage } from '../../../utils/constant';
+import { getData } from '../../../utils/api.services';
 
 export default function FeaturedProducts() {
   const [products, setProducts] = useState<Res_Product[]>([]);

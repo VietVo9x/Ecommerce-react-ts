@@ -8,19 +8,19 @@ import './style.scss';
 import { useDispatch } from 'react-redux';
 import { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
-import { SingleProductServices } from './SingleProductServices';
-// import { RootState } from '../../redux/store/configureStore';
-// import { getProducts } from '../../redux/slice/ProductStore';
-// import { login } from '../../redux/slice/AuthSlice';
+import { SingleProductServices } from './singleproduct.service';
 import PageHero from '../../components/PageHero';
 import { Res_Product } from '../../types/response.type';
-import { logout } from '../../redux/slice/AuthSlice';
+import { logout } from '../../redux/slice/auth.slice';
 import { calculateTotalQuantity, formatNumberToLocaleString } from '../../utils/constant';
-import { setTotalCart } from '../../redux/slice/CartSlice';
+import { setTotalCart } from '../../redux/slice/cart.slice';
+import ScrollToTopButton from '../../components/ScrollToTopButton';
+import { Res_Error } from '../../types/error.res';
 
 export default function SingleProduct() {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const singleProductService = new SingleProductServices();
-  const [value, setValue] = React.useState<number | null>(2);
+  const value: number | null = 2;
   const [quantityInput, setQuantityInput] = useState(1);
   const [product, setProduct] = useState<Res_Product>();
   const [image, setImage] = useState<string>();
@@ -74,18 +74,16 @@ export default function SingleProduct() {
         autoClose: 1000,
       });
     } catch (error) {
-      toast.error('Please log in to purchase', {
+      const newError = error as Res_Error;
+      toast.error(newError.message, {
         autoClose: 1000,
       });
-      dispatch(logout());
-      setTimeout(() => {
-        navigate('/login');
-      }, 2000);
     }
   };
 
   return (
     <>
+      <ScrollToTopButton />
       <ToastContainer />
       <PageHero title={`Products / ${product.product_name}`} />
       <section className="container">

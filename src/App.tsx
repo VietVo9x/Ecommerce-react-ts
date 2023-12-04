@@ -1,6 +1,6 @@
 import Header from './components/Header';
 import Footer from './components/Footer';
-import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
@@ -10,12 +10,13 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import ErrorPage from './pages/ErrorPage';
 import SingleProduct from './pages/SingleProduct';
-import { Auth, getCartQuantity } from './utils/Auth';
+import { Auth, getCartQuantity } from './utils/auth';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginSuccess, logout } from './redux/slice/AuthSlice';
-import { setTotalCart } from './redux/slice/CartSlice';
+import { loginSuccess, logout } from './redux/slice/auth.slice';
+import { setTotalCart } from './redux/slice/cart.slice';
 import { useEffect } from 'react';
 import { RootState } from './redux/store/configureStore';
+import Account from './pages/Account';
 
 function App() {
   const dispatch = useDispatch();
@@ -37,7 +38,7 @@ function App() {
     };
 
     handleLogin();
-  }, []);
+  }, [dispatch]);
 
   return (
     <div className="App">
@@ -50,6 +51,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/cart" element={isLogin ? <Cart /> : <Login />} />
+        <Route path="/account" element={isLogin ? <Account /> : <Login />} />
         <Route path="/checkout" element={isLogin ? <Checkout /> : <Login />} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>

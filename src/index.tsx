@@ -5,7 +5,7 @@ import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
 import './assets/css/global.scss';
 import { ThemeProvider } from '@mui/material';
-import { customTheme } from './utils/customTheme';
+import { customTheme } from './utils/custom.them';
 import 'react-toastify/dist/ReactToastify.css';
 import { Provider } from 'react-redux';
 import { store } from './redux/store/configureStore';

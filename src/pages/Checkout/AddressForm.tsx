@@ -2,43 +2,32 @@ import * as React from 'react';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
-import CheckoutService from './checkoutService';
-import { Err_Checkout_AddressForm } from '../../types/error.type';
 import { Req_Checkout_Address } from '../../types/request.type';
-const checkoutService = new CheckoutService();
+import ScrollToTopButton from '../../components/ScrollToTopButton';
 interface Props {
   setError: (err: any) => void;
   addressForm: Req_Checkout_Address;
   setAddressForm: Function;
 }
 export default function AddressForm(props: Props) {
-  const [formError, setFormError] = React.useState<Err_Checkout_AddressForm>({
-    isError: false,
-    msgFullName: '',
-    msgAddress: '',
-    msgPhone: '',
-    msgProvince: '',
-    msgCity: '',
-  });
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const name = event.target.name;
     const value = event.target.value;
     props.setAddressForm({ ...props.addressForm, [name]: value });
   };
   React.useEffect(() => {
-    // Validate
-    const errors = checkoutService.validator(props.addressForm);
+    const hasEmptyValue = Object.values(props.addressForm).some((value) => value === '');
 
-    if (errors.isError) {
+    if (hasEmptyValue) {
       props.setError(true);
     } else {
       props.setError(false);
     }
-    setFormError(errors);
-  }, [props.addressForm]);
+  }, [props, props.addressForm]);
 
   return (
     <React.Fragment>
+      <ScrollToTopButton />
       <Typography variant="h6" gutterBottom>
         Shipping address
       </Typography>
@@ -56,8 +45,6 @@ export default function AddressForm(props: Props) {
             onChange={(event) => {
               handleChange(event);
             }}
-            error={formError.msgFullName.length > 0}
-            helperText={formError.msgFullName}
           />
         </Grid>
         <Grid item xs={12}>
@@ -73,8 +60,6 @@ export default function AddressForm(props: Props) {
             onChange={(event) => {
               handleChange(event);
             }}
-            error={formError.msgAddress.length > 0}
-            helperText={formError.msgAddress}
           />
         </Grid>
         <Grid item xs={12}>
@@ -90,8 +75,6 @@ export default function AddressForm(props: Props) {
             onChange={(event) => {
               handleChange(event);
             }}
-            error={formError.msgPhone.length > 0}
-            helperText={formError.msgPhone}
           />
         </Grid>
 
@@ -108,12 +91,11 @@ export default function AddressForm(props: Props) {
             onChange={(event) => {
               handleChange(event);
             }}
-            error={formError.msgProvince.length > 0}
-            helperText={formError.msgProvince}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField
+            required
             id="state"
             name="city"
             label="City"
@@ -123,8 +105,6 @@ export default function AddressForm(props: Props) {
             onChange={(event) => {
               handleChange(event);
             }}
-            error={formError.msgCity.length > 0}
-            helperText={formError.msgCity}
           />
         </Grid>
       </Grid>

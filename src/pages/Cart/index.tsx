@@ -2,7 +2,7 @@ import { Button } from '@mui/material';
 import PageHero from '../../components/PageHero';
 import './style.scss';
 import { useDispatch } from 'react-redux';
-import { CartServices } from './CartServices';
+import { CartServices } from './cart.service';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -12,10 +12,11 @@ import {
   formatNumberToLocaleString,
   totalPriceCart,
 } from '../../utils/constant';
-import { setTotalCart } from '../../redux/slice/CartSlice';
+import { setTotalCart } from '../../redux/slice/cart.slice';
 export default function Cart() {
   const [cart, setCart] = useState<Res_Cart[]>([]);
   const dispatch = useDispatch();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const cartServices = new CartServices();
   const navigate = useNavigate();
   //tang giam so luong

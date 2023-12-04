@@ -16,8 +16,8 @@ export default function Review(props: Props) {
         Order summary
       </Typography>
       <List disablePadding>
-        {props.cart.map((cartItem) => (
-          <ListItem key={cartItem.id} sx={{ py: 1, px: 0 }}>
+        {props.cart.map((cartItem, index) => (
+          <ListItem key={index} sx={{ py: 1, px: 0 }}>
             <ListItemText
               primary={cartItem.product.product_name}
               secondary={'x ' + cartItem.quantity}

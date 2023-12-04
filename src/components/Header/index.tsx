@@ -1,5 +1,4 @@
 import * as React from 'react';
-import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
@@ -10,33 +9,49 @@ import { FaShoppingCart, FaUserPlus, FaBars, FaWindowClose } from 'react-icons/f
 import { links } from '../../routes';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux/es/exports';
-import { logout } from '../../redux/slice/AuthSlice';
+import { logout } from '../../redux/slice/auth.slice';
 import { RootState } from '../../redux/store/configureStore';
+import LogoutIcon from '@mui/icons-material/Logout';
+import SettingsIcon from '@mui/icons-material/Settings';
+import { setTotalCart } from '../../redux/slice/cart.slice';
+import Tooltip from '@mui/material/Tooltip';
+import IconButton from '@mui/material/IconButton';
+import Avatar from '@mui/material/Avatar';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
 import { Res_UserInfoLogin } from '../../types/response.type';
-import { setTotalCart } from '../../redux/slice/CartSlice';
-// import { I_authState, logout } from '../../redux/slice/AuthSlice';
-// import { RootState } from '../../redux/store/configureStore';
 
 export default function Header() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const settings: string[] = ['Account', 'Logout'];
   const [showNavMobile, setShowNavMobile] = useState(false);
   const isLogin = useSelector((state: RootState) => state.auth.isLogin);
-  const user = useSelector(
-    (state: { auth: { user: Res_UserInfoLogin | null } }) => state.auth.user,
-  );
+  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const quantityCart = useSelector((state: RootState) => state.cart.quantity);
+  const user = useSelector(
+    (state: { auth: { isLogin: Boolean; user: Res_UserInfoLogin } }) => state.auth.user,
+  );
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   // Mui menu account start
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElUser(event.currentTarget);
+  };
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+    navigate('/account');
+  };
 
   const handleLogout = async () => {
+    handleCloseUserMenu();
     handleClose();
     localStorage.removeItem('token');
     dispatch(logout());
@@ -128,41 +143,61 @@ export default function Header() {
             </span>
           </Link>
           {isLogin ? (
-            <div>
-              <Button
-                variant="contained"
-                color="secondary"
-                id="basic-button"
-                aria-controls={open ? 'basic-menu' : undefined}
-                aria-haspopup="true"
-                aria-expanded={open ? 'true' : undefined}
-                onClick={handleClick}
-              >
-                Hello ,{user && user?.user_name}
-              </Button>
+            <Box sx={{ flexGrow: 0 }}>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Tooltip title="Open settings">
+                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                    <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                  </IconButton>
+                </Tooltip>
+                <Typography
+                  component={'h2'}
+                  textAlign="center"
+                  color={'secondary'}
+                  style={{
+                    fontSize: '1.2rem',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  Hello,{user?.user_name}
+                </Typography>
+              </Stack>
               <Menu
-                id="basic-menu"
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleClose}
-                MenuListProps={{
-                  'aria-labelledby': 'basic-button',
+                sx={{ mt: '45px' }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
                 }}
                 keepMounted
                 transformOrigin={{
                   vertical: 'top',
-                  horizontal: 'left',
+                  horizontal: 'right',
                 }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
               >
-                <MenuItem onClick={handleClose}>
-                  <SettingsOutlinedIcon sx={{ marginRight: '5px' }} /> My account
+                <MenuItem onClick={handleCloseUserMenu}>
+                  <Typography
+                    textAlign="center"
+                    style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
+                  >
+                    <SettingsIcon />
+                    Account
+                  </Typography>
                 </MenuItem>
                 <MenuItem onClick={handleLogout}>
-                  <ExitToAppIcon sx={{ marginRight: '5px' }} />
-                  Logout
+                  <Typography
+                    textAlign="center"
+                    style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
+                  >
+                    <LogoutIcon />
+                    Logout
+                  </Typography>
                 </MenuItem>
               </Menu>
-            </div>
+            </Box>
           ) : (
             <Link to="/login" className="nav__btns--login">
               Login

@@ -23,3 +23,10 @@ export interface Req_Checkout_Address {
   province: string;
   city: string;
 }
+export interface Req_UserUpdate {
+  email: string;
+  user_name: string;
+  full_name: string;
+  phone: string;
+  address: string;
+}

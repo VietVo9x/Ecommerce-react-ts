@@ -39,7 +39,7 @@ export const insertData = async (pathName: any, data: any) => {
   }
 };
 
-//edit toan bo
+//edit
 export const updateData = async (pathName: any, id: any, data: any) => {
   try {
     const response = await axiosInstance.put(`${api}${pathName}${id}`, data);
@@ -54,7 +54,7 @@ export const updateData = async (pathName: any, id: any, data: any) => {
 
 export const deleteData = async (pathName: any, id: any) => {
   try {
-    const response = await axiosInstance.delete(api + pathName + id); // Chú ý cách bạn kết hợp pathName và id.
+    const response = await axiosInstance.delete(api + pathName + id);
     return response;
   } catch (error) {
     if (error instanceof AxiosError && error.response) {

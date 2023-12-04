@@ -9,7 +9,8 @@ const _CART_CREATE = '/cart/create';
 const _CART_UPDATE = '/cart/update/';
 const _CART_DELETE_ITEM = '/cart/delete-item/';
 const _CART_CLEAR = '/cart/delete-all/';
-
+const _ORDER = '/order';
+const _ORDER_CREATE = '/order/create';
 export {
   _USER,
   _USER_REGISTER,
@@ -22,4 +23,6 @@ export {
   _CART_CLEAR,
   _CART_DELETE_ITEM,
   _CART_UPDATE,
+  _ORDER,
+  _ORDER_CREATE,
 };
