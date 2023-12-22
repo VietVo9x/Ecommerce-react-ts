@@ -1,13 +1,14 @@
 import { AxiosError } from 'axios';
 import { api } from '../apis';
 import { axiosInstance } from '../apis/configAxios';
+import { log } from 'console';
 // const axiosInstance = createAxiosInstance();
 
 //get data
 export const getData = async (pathName: any) => {
   try {
     const response = await axiosInstance.get(api + pathName);
-    return response;
+    return response.data;
   } catch (error) {
     if (error instanceof AxiosError && error.response) {
       throw error.response.data;
@@ -19,7 +20,7 @@ export const getData = async (pathName: any) => {
 export const getDataForID = async (pathName: any, id: any) => {
   try {
     const response = await axiosInstance.get(`${api}${pathName}/${id}`);
-    return response;
+    return response.data;
   } catch (error) {
     if (error instanceof AxiosError && error.response) {
       throw error.response.data;
@@ -28,10 +29,10 @@ export const getDataForID = async (pathName: any, id: any) => {
 };
 
 //them moi
-export const insertData = async (pathName: any, data: any) => {
+export const postData = async (pathName: any, data: any) => {
   try {
     const response = await axiosInstance.post(api + pathName, data);
-    return response;
+    return response.data;
   } catch (error) {
     if (error instanceof AxiosError && error.response) {
       throw error.response.data;
@@ -40,11 +41,23 @@ export const insertData = async (pathName: any, data: any) => {
 };
 
 //edit
-export const updateData = async (pathName: any, id: any, data: any) => {
+export const putData = async (pathName: any, id: any, data: any) => {
   try {
-    const response = await axiosInstance.put(`${api}${pathName}${id}`, data);
+    const response = await axiosInstance.put(`${api}${pathName}/${id}`, data);
 
-    return response;
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError && error.response) {
+      throw error.response.data;
+    }
+  }
+};
+//edit
+export const patchData = async (pathName: any, id: any, data: any) => {
+  try {
+    const response = await axiosInstance.patch(`${api}${pathName}/${id}`, data);
+
+    return response.data;
   } catch (error) {
     if (error instanceof AxiosError && error.response) {
       throw error.response.data;
@@ -55,7 +68,7 @@ export const updateData = async (pathName: any, id: any, data: any) => {
 export const deleteData = async (pathName: any, id: any) => {
   try {
     const response = await axiosInstance.delete(api + pathName + id);
-    return response;
+    return response.data;
   } catch (error) {
     if (error instanceof AxiosError && error.response) {
       throw error.response.data;

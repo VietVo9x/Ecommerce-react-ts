@@ -7,6 +7,8 @@ import { Req_UserUpdate } from '../../types/request.type';
 import { Res_Error } from '../../types/error.res';
 import { ToastContainer, toast } from 'react-toastify';
 import AccountService from './account.service';
+import { displayError } from '../../utils/display-error';
+import { displaySuccessMessage } from '../../utils/display-success';
 
 interface Props {
   user: Res_UserInfoLogin | undefined;
@@ -23,6 +25,7 @@ export default function UpdateInfoUser(props: Props) {
     phone: '',
     address: '',
   });
+
   useEffect(() => {
     if (props.user) {
       setUserUpdate({
@@ -35,34 +38,25 @@ export default function UpdateInfoUser(props: Props) {
     }
   }, [props.user]);
 
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setUserUpdate((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const name = event.target.name;
+    const value = event.target.value;
+    setUserUpdate({ ...userUpdate, [name]: value });
   };
   const handleEditClick = () => {
     setEditing(true);
   };
   const handleSaveClick = async () => {
     setEditing(false);
-
     try {
       if (props.user) {
-        const updateUser = await accountService.UpdateInfo(props.user?.id, userUpdate);
-        toast.success('Update info successfully', {
-          autoClose: 1000,
-        });
+        await accountService.UpdateInfo(props.user.id, userUpdate);
+        displaySuccessMessage('Updated info successfully');
         props.setFlag(!props.flag);
         setEditing(false);
       }
     } catch (error) {
-      const newError = error as Res_Error;
-      toast.error(newError.message, {
-        autoClose: 1000,
-      });
+      displayError(error);
     }
   };
 
@@ -73,15 +67,16 @@ export default function UpdateInfoUser(props: Props) {
       <TextField
         id="user_name"
         label="User Name"
+        name="user_name"
         fullWidth
         style={{ marginTop: '16px' }}
         value={userUpdate.user_name}
-        onChange={handleOnChange}
-        disabled={!isEditing}
+        disabled
       />
       <TextField
         id="full_name"
         label="Full name"
+        name="full_name"
         fullWidth
         style={{ marginTop: '16px' }}
         value={userUpdate.full_name}
@@ -91,6 +86,7 @@ export default function UpdateInfoUser(props: Props) {
       <TextField
         id="address"
         label="Address"
+        name="address"
         fullWidth
         style={{ marginTop: '16px' }}
         value={userUpdate.address}
@@ -100,6 +96,7 @@ export default function UpdateInfoUser(props: Props) {
       <TextField
         id="phone"
         label="Phone Number"
+        name="phone"
         fullWidth
         style={{ marginTop: '16px', marginBottom: '16px' }}
         value={userUpdate.phone}
@@ -107,11 +104,11 @@ export default function UpdateInfoUser(props: Props) {
         disabled={!isEditing}
       />
       {!isEditing ? (
-        <Button variant="contained" onClick={handleEditClick}>
+        <Button fullWidth variant="contained" onClick={handleEditClick}>
           Edit
         </Button>
       ) : (
-        <Button variant="contained" onClick={handleSaveClick} color="success">
+        <Button fullWidth variant="contained" onClick={handleSaveClick} color="success">
           Save
         </Button>
       )}

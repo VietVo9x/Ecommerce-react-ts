@@ -12,7 +12,6 @@ import { getData } from '../../utils/api.services';
 import { _VERIFY_TOKEN } from '../../utils/constant.api';
 import { Res_Error } from '../../types/error.res';
 import { ToastContainer, toast } from 'react-toastify';
-import { useSelector } from 'react-redux';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -58,9 +57,9 @@ export default function Account() {
   React.useEffect(() => {
     getData(_VERIFY_TOKEN)
       .then((res) => {
-        console.log(res?.data);
         if (res) {
-          setUser(res.data);
+          console.log(res);
+          setUser(res);
         }
       })
       .catch((error) => {
@@ -68,6 +67,7 @@ export default function Account() {
         toast.error(newErr.message, { autoClose: 1000 });
       });
   }, [flag]);
+
   return (
     <Box
       sx={{

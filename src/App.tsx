@@ -10,7 +10,7 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import ErrorPage from './pages/ErrorPage';
 import SingleProduct from './pages/SingleProduct';
-import { Auth, getCartQuantity } from './utils/auth';
+import { Auth } from './utils/auth';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginSuccess, logout } from './redux/slice/auth.slice';
 import { setTotalCart } from './redux/slice/cart.slice';
@@ -27,9 +27,9 @@ function App() {
       try {
         const res = await Auth();
         if (res) {
-          dispatch(loginSuccess(res.data));
-          const totalQuantityCart = await getCartQuantity();
-          if (totalQuantityCart) dispatch(setTotalCart(totalQuantityCart));
+          dispatch(loginSuccess(res));
+          // const totalQuantityCart = await getCartQuantity();
+          // if (totalQuantityCart) dispatch(setTotalCart(totalQuantityCart));
         }
       } catch (error) {
         dispatch(logout());

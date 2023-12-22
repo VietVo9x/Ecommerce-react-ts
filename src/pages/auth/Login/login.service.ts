@@ -1,12 +1,12 @@
 import { Req_UserLogin } from '../../../types/request.type';
-import { getData, insertData } from '../../../utils/api.services';
+import { getData, postData } from '../../../utils/api.services';
 import { _CART, _USER_LOGIN, _VERIFY_TOKEN } from '../../../utils/constant.api';
 export class LoginServices {
   async onLogin(dataForm: Req_UserLogin) {
     try {
-      const userLogin = await insertData(_USER_LOGIN, dataForm);
-      localStorage.setItem('token', userLogin?.headers.authorization);
-      return userLogin;
+      const result = await postData(_USER_LOGIN, dataForm);
+      localStorage.setItem('token', result.token);
+      return result.user;
     } catch (error) {
       throw error;
     }

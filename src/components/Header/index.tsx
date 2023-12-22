@@ -1,5 +1,5 @@
+/* eslint-disable no-restricted-globals */
 import * as React from 'react';
-import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
@@ -11,48 +11,58 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux/es/exports';
 import { logout } from '../../redux/slice/auth.slice';
 import { RootState } from '../../redux/store/configureStore';
-import LogoutIcon from '@mui/icons-material/Logout';
-import SettingsIcon from '@mui/icons-material/Settings';
 import { setTotalCart } from '../../redux/slice/cart.slice';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
-import { Res_UserInfoLogin } from '../../types/response.type';
+import { Button, ClickAwayListener, Grow, MenuList, Paper, Popper } from '@mui/material';
 
 export default function Header() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const settings: string[] = ['Account', 'Logout'];
   const [showNavMobile, setShowNavMobile] = useState(false);
   const isLogin = useSelector((state: RootState) => state.auth.isLogin);
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const quantityCart = useSelector((state: RootState) => state.cart.quantity);
-  const user = useSelector(
-    (state: { auth: { isLogin: Boolean; user: Res_UserInfoLogin } }) => state.auth.user,
-  );
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  // Mui menu account start
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
-  const handleClose = () => {
-    setAnchorEl(null);
+  // mui
+  const [open, setOpen] = React.useState(false);
+  const anchorRef = React.useRef<HTMLButtonElement>(null);
+
+  const handleToggle = () => {
+    setOpen((prevOpen) => !prevOpen);
   };
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElUser(event.currentTarget);
-  };
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-    navigate('/account');
+
+  function handleListKeyDown(event: React.KeyboardEvent) {
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      setOpen(false);
+    } else if (event.key === 'Escape') {
+      setOpen(false);
+    }
+  }
+
+  // return focus to the button when we transitioned from !open -> open
+  const prevOpen = React.useRef(open);
+  React.useEffect(() => {
+    if (prevOpen.current === true && open === false) {
+      anchorRef.current!.focus();
+    }
+    prevOpen.current = open;
+  }, [open]);
+
+  // Mui menu account start
+
+  const handleClose = (event: any) => {
+    if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
+      return;
+    }
+    setOpen(false);
   };
 
   const handleLogout = async () => {
-    handleCloseUserMenu();
-    handleClose();
     localStorage.removeItem('token');
     dispatch(logout());
     dispatch(setTotalCart(0));
@@ -143,61 +153,62 @@ export default function Header() {
             </span>
           </Link>
           {isLogin ? (
-            <Box sx={{ flexGrow: 0 }}>
-              <Stack direction="row" spacing={1} alignItems="center">
-                <Tooltip title="Open settings">
-                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                    <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-                  </IconButton>
-                </Tooltip>
-                <Typography
-                  component={'h2'}
-                  textAlign="center"
-                  color={'secondary'}
-                  style={{
-                    fontSize: '1.2rem',
-                    fontWeight: 'bold',
-                  }}
+            <Stack direction="row" spacing={2}>
+              <div>
+                <Button
+                  ref={anchorRef}
+                  id="composition-button"
+                  aria-controls={open ? 'composition-menu' : undefined}
+                  aria-expanded={open ? 'true' : undefined}
+                  aria-haspopup="true"
+                  onClick={handleToggle}
                 >
-                  Hello,{user?.user_name}
-                </Typography>
-              </Stack>
-              <Menu
-                sx={{ mt: '45px' }}
-                id="menu-appbar"
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
-              >
-                <MenuItem onClick={handleCloseUserMenu}>
-                  <Typography
-                    textAlign="center"
-                    style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
-                  >
-                    <SettingsIcon />
-                    Account
-                  </Typography>
-                </MenuItem>
-                <MenuItem onClick={handleLogout}>
-                  <Typography
-                    textAlign="center"
-                    style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
-                  >
-                    <LogoutIcon />
-                    Logout
-                  </Typography>
-                </MenuItem>
-              </Menu>
-            </Box>
+                  <Tooltip title="Open settings">
+                    <IconButton sx={{ p: 0 }}>
+                      <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                    </IconButton>
+                  </Tooltip>
+                </Button>
+                <Popper
+                  open={open}
+                  anchorEl={anchorRef.current}
+                  role={undefined}
+                  placement="bottom-start"
+                  transition
+                  disablePortal
+                >
+                  {({ TransitionProps, placement }) => (
+                    <Grow
+                      {...TransitionProps}
+                      style={{
+                        transformOrigin: placement === 'bottom-start' ? 'left top' : 'left bottom',
+                      }}
+                    >
+                      <Paper>
+                        <ClickAwayListener onClickAway={handleClose}>
+                          <MenuList
+                            autoFocusItem={open}
+                            id="composition-menu"
+                            aria-labelledby="composition-button"
+                            onKeyDown={handleListKeyDown}
+                          >
+                            <MenuItem
+                              onClick={() => {
+                                handleClose(event);
+                                navigate('/account');
+                              }}
+                            >
+                              My account
+                            </MenuItem>
+                            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                          </MenuList>
+                        </ClickAwayListener>
+                      </Paper>
+                    </Grow>
+                  )}
+                </Popper>
+              </div>
+            </Stack>
           ) : (
             <Link to="/login" className="nav__btns--login">
               Login

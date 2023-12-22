@@ -16,6 +16,7 @@ import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../../../redux/slice/auth.slice';
 import { setTotalCart } from '../../../redux/slice/cart.slice';
 import { calculateTotalQuantity } from '../../../utils/constant';
+import { displaySuccessMessage } from '../../../utils/display-success';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -40,22 +41,18 @@ export default function Login() {
         return;
       }
       const responseLogin = await loginServices.onLogin(dataForm);
-      dispatch(loginSuccess(responseLogin?.data));
-      toast.success('Login successful', {
-        autoClose: 1000,
-      });
+      dispatch(loginSuccess(responseLogin));
+      displaySuccessMessage('Login successful');
 
       // Gọi API để lấy thông tin giỏ hàng sau khi đăng nhập thành công
-      const cartResponse = await loginServices.getCart(); // Thay đổi đường dẫn API tương ứng của bạn
-      if (cartResponse && Array.isArray(cartResponse.data)) {
-        const cartData = cartResponse.data;
-        const totalQuantity = calculateTotalQuantity(cartData);
-        dispatch(setTotalCart(totalQuantity));
-      }
+      // const cartResponse = await loginServices.getCart();
+      // if (cartResponse && Array.isArray(cartResponse.data)) {
+      //   const cartData = cartResponse.data;
+      //   const totalQuantity = calculateTotalQuantity(cartData);
+      //   dispatch(setTotalCart(totalQuantity));
+      // }
 
-      setTimeout(() => {
-        navigate('/');
-      }, 1000);
+      navigate('/');
     } catch (error) {
       const newError = error as Res_Err_User_Login;
       toast.error(newError.message, {

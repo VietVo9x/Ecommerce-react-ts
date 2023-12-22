@@ -18,3 +18,9 @@ export interface Err_Checkout_AddressForm {
   msgProvince: string;
   msgCity: string;
 }
+export interface Err_Update_PasswordForm {
+  isError: boolean;
+  msgOldPassword: string;
+  msgNewPassword: string;
+  msgConfirmPassword: string;
+}

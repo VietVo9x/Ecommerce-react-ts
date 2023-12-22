@@ -19,7 +19,6 @@ export default function ImageUpload() {
         .then(async (snapshot) => {
           console.log('Uploaded file thanh cong', snapshot);
           const newUrl = await getDownloadURL(storageRef);
-
           console.log(newUrl);
           setUrl(newUrl);
         })

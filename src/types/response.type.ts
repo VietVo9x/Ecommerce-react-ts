@@ -1,18 +1,19 @@
 export interface Res_UserLogin {
   token: string;
+  user: Res_UserInfoLogin;
 }
 export interface Res_UserInfoLogin {
   id: number;
   user_name: string;
   full_name: string;
-  status: number;
+  status: boolean;
   role: number;
   email: string;
   phone: string;
   address: string;
-  avatar: string | null;
-  created_at: string;
-  updated_at: string;
+  avatar: string;
+  createdAt: string;
+  updatedAt: string;
   deletedAt: null;
 }
 export interface Res_Category {

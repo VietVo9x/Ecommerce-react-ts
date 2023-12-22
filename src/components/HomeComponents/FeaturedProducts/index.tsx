@@ -29,11 +29,11 @@ export default function FeaturedProducts() {
     navigate('/products/' + id);
   };
   useEffect(() => {
-    getData(`/product?limit=8&sort=${sortValue}&order=${sortOrder}`)
-      .then((res) => {
-        if (res) setProducts(res.data);
-      })
-      .catch((err) => console.log(err));
+    // getData(`/product?limit=8&sort=${sortValue}&order=${sortOrder}`)
+    //   .then((res) => {
+    //     if (res) setProducts(res.data);
+    //   })
+    //   .catch((err) => console.log(err));
   }, []);
 
   return (

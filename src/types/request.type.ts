@@ -30,3 +30,8 @@ export interface Req_UserUpdate {
   phone: string;
   address: string;
 }
+export interface Req_UpdatePassword {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
