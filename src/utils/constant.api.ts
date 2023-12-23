@@ -6,8 +6,11 @@ const _VERIFY_TOKEN = '/users/verify-token';
 const _PROFILE_UPDATE_INFO = '/profile/update-info';
 const _PROFILE_UPDATE_AVATAR = '/profile/update-avatar';
 const _CATEGORY = '/category';
-const _PRODUCT = '/product';
-const _CART = '/cart';
+const _PRODUCT = '/products/all';
+const _PRODUCT_BY_ID = '/products';
+const _COMMENT = '/reviews';
+const _COMMENT_BY_PRODUCT = '/reviews/by-product';
+const _CART = '/shopping-cart';
 const _CART_CREATE = '/cart/create';
 const _CART_UPDATE = '/cart/update/';
 const _CART_DELETE_ITEM = '/cart/delete-item/';
@@ -31,4 +34,7 @@ export {
   _ORDER_CREATE,
   _PROFILE_UPDATE_INFO,
   _PROFILE_UPDATE_AVATAR,
+  _PRODUCT_BY_ID,
+  _COMMENT,
+  _COMMENT_BY_PRODUCT,
 };

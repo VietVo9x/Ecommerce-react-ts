@@ -1,11 +1,12 @@
+import { UserRegisterEntity } from '../../../types/entity';
 import { Req_UserRegister } from '../../../types/request.type';
-import { insertData } from '../../../utils/api.services';
+import { postData } from '../../../utils/api.services';
 import { _USER_REGISTER } from '../../../utils/constant.api';
 
 export default class RegisterServices {
-  register(dataForm: Req_UserRegister) {
+  async register(dataForm: UserRegisterEntity) {
     try {
-      const createUser = insertData(_USER_REGISTER, dataForm);
+      const createUser = await postData(_USER_REGISTER, dataForm);
       return createUser;
     } catch (error) {
       throw error;

@@ -1,4 +1,4 @@
-import { Res_Cart } from '../types/response.type';
+import { Res_CartItem } from '../types/response.type';
 import { getData } from './api.services';
 import { calculateTotalQuantity } from './constant';
 import { _CART, _VERIFY_TOKEN } from './constant.api';
@@ -18,7 +18,7 @@ const getCartQuantity = async () => {
   try {
     const cartResponse = await getData(_CART);
     if (cartResponse) {
-      const carData: Res_Cart[] = cartResponse.data;
+      const carData: Res_CartItem[] = cartResponse;
       const totalQuantityCart = calculateTotalQuantity(carData);
       return totalQuantityCart;
     }

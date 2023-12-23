@@ -5,9 +5,9 @@ import { log } from 'console';
 // const axiosInstance = createAxiosInstance();
 
 //get data
-export const getData = async (pathName: any) => {
+export const getData = async (pathName: any, param?: any) => {
   try {
-    const response = await axiosInstance.get(api + pathName);
+    const response = await axiosInstance.get(api + pathName, { params: param });
     return response.data;
   } catch (error) {
     if (error instanceof AxiosError && error.response) {

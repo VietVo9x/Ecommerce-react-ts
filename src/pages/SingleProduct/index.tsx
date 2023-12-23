@@ -5,53 +5,63 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffect } from 'react';
 
 import './style.scss';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import { SingleProductServices } from './singleproduct.service';
 import PageHero from '../../components/PageHero';
-import { Res_Product } from '../../types/response.type';
-import { logout } from '../../redux/slice/auth.slice';
-import { calculateTotalQuantity, formatNumberToLocaleString } from '../../utils/constant';
+import { Res_Comment, Res_Product } from '../../types/response.type';
+import { calculateTotalQuantity, formatCurrency } from '../../utils/constant';
 import { setTotalCart } from '../../redux/slice/cart.slice';
+import { displayError } from '../../utils/display-error';
+import { displaySuccessMessage } from '../../utils/display-success';
 import ScrollToTopButton from '../../components/ScrollToTopButton';
-import { Res_Error } from '../../types/error.res';
+import ListComment from './list-comment';
+import Comment from './comment';
+import { Stack } from '@mui/material';
+import { RootState } from '../../redux/store/configureStore';
+import { initialProduct } from '../../utils/common/initial-state';
 
 export default function SingleProduct() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const singleProductService = new SingleProductServices();
   const value: number | null = 2;
   const [quantityInput, setQuantityInput] = useState(1);
-  const [product, setProduct] = useState<Res_Product>();
+  const [product, setProduct] = useState<Res_Product>(initialProduct);
   const [image, setImage] = useState<string>();
+  const [comments, setComments] = useState<Res_Comment[]>([]);
+  const [reload, setReload] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const user = useSelector((state: RootState) => state.auth.user);
   const { id } = useParams();
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   useEffect(() => {
-    if (id) {
-      singleProductService.getProduct(id).then((res) => {
-        setProduct(res?.data);
-        setImage(res?.data.imageProducts[0].image_url);
-      });
-    }
-  }, []);
+    singleProductService.getProduct(Number(id)).then((res) => {
+      setProduct(res);
+      setImage(res.images[0].imageUrl);
+    });
+  }, [reload]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    singleProductService.getCommentsByProduct(Number(id)).then((res) => {
+      setComments(res);
+      setIsLoading(false);
+    });
+  }, [reload]);
 
   const setBigImageProduct = (url: string) => {
     setImage(url);
   };
   const handleChangeQuantity = (e: React.ChangeEvent<HTMLInputElement>) => {
     const enteredValue = e.target.value;
-    const isNumber = /^[0-9\b]+$/;
 
-    if (enteredValue !== '' || isNumber.test(enteredValue)) {
+    // Kiểm tra nếu giá trị là số và lớn hơn 0
+    const isNumber = /^[1-9]\d*$/;
+    if (isNumber.test(enteredValue)) {
       setQuantityInput(Number(enteredValue));
     }
   };
-
-  if (!product) {
-    navigate('/*');
-    return <></>;
-  }
 
   const handleQuantity = (action: 'up' | 'down') => {
     if (action === 'up' && quantityInput < product.quantity_stock) {
@@ -62,100 +72,106 @@ export default function SingleProduct() {
   };
   const handleAddToCart = async () => {
     try {
-      const productCart = {
-        product_id: product.id,
+      const cart = {
+        productId: product.id,
+        userId: user.id,
         quantity: quantityInput,
       };
-      const insertProductCart = await singleProductService.createCart(productCart);
-
-      const totalQuantity = calculateTotalQuantity(insertProductCart?.data);
-      dispatch(setTotalCart(totalQuantity));
-      toast.success('Product added successfully', {
-        autoClose: 1000,
-      });
+      const insertProductCart = await singleProductService.createCart(cart);
+      dispatch(setTotalCart(insertProductCart.quantity));
+      displaySuccessMessage('Product added successfully');
     } catch (error) {
-      const newError = error as Res_Error;
-      toast.error(newError.message, {
-        autoClose: 1000,
-      });
+      displayError(error);
     }
   };
 
+  const calAverageRating = () => {
+    const totalRating = comments.reduce((total, comment) => {
+      return total + comment.rate;
+    }, 0);
+    const avenrageRating = totalRating / comments.length;
+    return avenrageRating;
+  };
+
   return (
-    <>
-      <ScrollToTopButton />
-      <ToastContainer />
-      <PageHero title={`Products / ${product.product_name}`} />
-      <section className="container">
-        <div className="btn--back">
-          <Link to="/products">BACK TO PRODUCTS</Link>
-        </div>
-        <div className="product">
-          <div className="product__images">
-            <div className="product__images--main">
-              <img src={image} alt="anh chinh" />
+    product.id > 0 && (
+      <>
+        <ScrollToTopButton />
+        <ToastContainer />
+        <PageHero path="/products" title={`Products`} subtitle={product.product_name} />
+        <section className="container">
+          <div className="btn--back">
+            <Link to="/products">BACK TO PRODUCTS</Link>
+          </div>
+          <div className="product">
+            <div className="product__images">
+              <div className="product__images--main">
+                <img src={image} alt="anh chinh" />
+              </div>
+              <div className="product__images--sub">
+                {product &&
+                  product.images.map((image, index) => (
+                    <img
+                      key={index}
+                      src={image.imageUrl}
+                      alt={image.imageUrl}
+                      onClick={() => {
+                        setBigImageProduct(image.imageUrl);
+                      }}
+                    />
+                  ))}
+              </div>
             </div>
-            <div className="product__images--sub">
-              {product &&
-                product.imageProducts.map((image, index) => (
-                  <img
-                    key={index}
-                    src={image.image_url}
-                    alt={image.image_url}
-                    onClick={() => {
-                      setBigImageProduct(image.image_url);
-                    }}
+            <div className="product__content">
+              <Typography component={'h4'} variant="h5">
+                {product?.product_name}
+              </Typography>
+              <div className="product__content--rating">
+                <span>
+                  <Rating name="read-only" value={calAverageRating()} readOnly />
+                </span>
+                <span>({comments.length} customer reviews)</span>
+              </div>
+              <Typography component={'h2'} variant="h5" pt={2}>
+                {formatCurrency(product.price)}
+              </Typography>
+              <p className="product__content--desc"> {product?.description}</p>
+              <p className="product__content--info">
+                <span>Available :</span>
+                {product?.quantity_stock}
+              </p>
+              <p className="product__content--info">
+                <span>Category :</span>
+                {product.category.name}
+              </p>
+              <div className="product__content--action">
+                <button onClick={() => handleQuantity('down')} disabled={quantityInput === 1}>
+                  -
+                </button>
+                {quantityInput && (
+                  <input
+                    type="text"
+                    value={
+                      quantityInput > product.quantity_stock
+                        ? product.quantity_stock
+                        : quantityInput
+                    }
+                    onChange={(e) => handleChangeQuantity(e)}
                   />
-                ))}
-            </div>
-          </div>
-          <div className="product__content">
-            <Typography component={'h2'} variant="h2">
-              {product?.product_name}
-            </Typography>
-            <div className="product__content--rating">
-              <span>
-                <Rating name="read-only" value={value} readOnly />
-              </span>
-              <span>(100 customer reviews)</span>
-            </div>
-            <Typography component={'h5'} variant="h4" pt={2}>
-              $ {formatNumberToLocaleString(product?.price)}
-            </Typography>
-            <p className="product__content--desc"> {product?.description}</p>
-            <p className="product__content--info">
-              <span>Available :</span>
-              {product?.quantity_stock}
-            </p>
-            <p className="product__content--info">
-              <span>SKU : </span>
-              {product?.sku}
-            </p>
-            <p className="product__content--info">
-              <span>Brand :</span>
-              {product.category.category_name}
-            </p>
-            <div className="product__content--action">
-              <button onClick={() => handleQuantity('down')} disabled={quantityInput === 1}>
-                -
+                )}
+                <button onClick={() => handleQuantity('up')}>+</button>
+              </div>
+              <button onClick={handleAddToCart} disabled={product.quantity_stock === 0}>
+                ADD TO CART
               </button>
-              {quantityInput && (
-                <input
-                  type="number"
-                  value={
-                    quantityInput > product.quantity_stock ? product.quantity_stock : quantityInput
-                  }
-                  onChange={(e) => handleChangeQuantity(e)}
-                />
-              )}
-              <button onClick={() => handleQuantity('up')}>+</button>
             </div>
-            <button onClick={handleAddToCart} disabled={product.quantity_stock === 0}>
-              ADD TO CART
-            </button>
           </div>
-        </div>
-      </section>
-    </>
+        </section>
+        <Stack sx={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <Comment product={product} reload={reload} setReload={setReload} />
+          <ListComment comments={comments} />
+        </Stack>
+      </>
+    )
   );
 }

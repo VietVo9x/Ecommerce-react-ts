@@ -18,36 +18,48 @@ export interface Res_UserInfoLogin {
 }
 export interface Res_Category {
   id: number;
-  category_name: string;
+  name: string;
   description: string;
-  status: number;
-  deleteAt: null | number;
+  status: boolean;
+  isDelete: boolean;
+}
+export interface Res_Image {
+  id: number;
+  imageUrl: string;
+  productId: number;
 }
 export interface Res_Product {
   id: number;
-  product_name: string;
   price: number;
-  sku: string;
+  product_name: string;
   quantity_stock: number;
   description: string;
-  category: {
-    id: number;
-    category_name: string;
-  };
-  imageProducts: {
-    image_url: string;
-  }[];
+  categoryId: number;
+  brandId: number;
+  status: boolean;
+  isDelete: boolean;
+  createdAt: string;
+  updatedAt: string;
+  images: Res_Image[];
+  category: Res_Category;
+}
+export interface Res_Comment {
+  id: number;
+  productId: number;
+  userId: number;
+  user_name: string;
+  comment: string;
+  rate: number;
+  image_user: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface Res_Cart {
+export interface Res_CartItem {
   id: number;
   quantity: number;
-  product: {
-    product_name: string;
-    price: number;
-    id: number;
-    imageProducts: {
-      image_url: string;
-    }[];
-  };
+  userId: number;
+  createdAt: string;
+  updatedAt: string;
+  product: Res_Product;
 }

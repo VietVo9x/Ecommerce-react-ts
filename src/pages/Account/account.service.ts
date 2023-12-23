@@ -1,12 +1,18 @@
 import { ChangePasswordEntity } from '../../types/entity';
 import { Req_UpdatePassword, Req_UserUpdate } from '../../types/request.type';
-import { patchData, putData } from '../../utils/api.services';
-import { _PROFILE_UPDATE_INFO, _USER_LOGIN, _USER_UPDATE_PASSWORD } from '../../utils/constant.api';
+import { patchData } from '../../utils/api.services';
+import { isFileValidSize, isValidFileType } from '../../utils/common/validate-file';
+import {
+  _PROFILE_UPDATE_AVATAR,
+  _PROFILE_UPDATE_INFO,
+  _USER_LOGIN,
+  _USER_UPDATE_PASSWORD,
+} from '../../utils/constant.api';
 
 export default class AccountService {
   async UpdateInfo(id: number, dataForm: Req_UserUpdate) {
     try {
-      return await putData(_PROFILE_UPDATE_INFO, id, dataForm);
+      return await patchData(_PROFILE_UPDATE_INFO, id, dataForm);
     } catch (error) {
       throw error;
     }
@@ -59,5 +65,36 @@ export default class AccountService {
       throw error;
     }
   }
-  UpdateAvatar() {}
+  validateFile(file: File) {
+    const error = {
+      isError: false,
+      msgFile: '',
+    };
+
+    if (!file) {
+      error.isError = true;
+      error.msgFile = 'File is not selected.';
+    }
+
+    const invalidFilesSize = isFileValidSize(file);
+    const invalidFilesType = isValidFileType(file.name);
+    if (!invalidFilesSize) {
+      error.isError = true;
+      error.msgFile = 'Image maximum size is 1MB';
+    } else if (!invalidFilesType) {
+      error.isError = true;
+      error.msgFile = 'Image must be jpg,png,jpeg';
+    }
+
+    return error;
+  }
+  async UpdateAvatar(id: number, file: File) {
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      return await patchData(_PROFILE_UPDATE_AVATAR, id, formData);
+    } catch (error) {
+      throw error;
+    }
+  }
 }

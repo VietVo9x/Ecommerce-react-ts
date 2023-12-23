@@ -1,12 +1,13 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { Res_UserInfoLogin } from '../../types/response.type';
+import { initialUser } from '../../utils/common/initial-state';
 export interface I_authState {
   isLogin: boolean;
-  user: Res_UserInfoLogin | undefined;
+  user: Res_UserInfoLogin;
 }
 const initialState = {
   isLogin: false,
-  user: undefined,
+  user: initialUser,
 };
 const authSlice = createSlice({
   name: 'auth',
@@ -17,7 +18,7 @@ const authSlice = createSlice({
       state.isLogin = true;
     },
     logout: (state: I_authState) => {
-      state.user = undefined;
+      state.user = initialState.user;
       state.isLogin = false;
     },
   },

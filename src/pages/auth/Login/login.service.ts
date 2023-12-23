@@ -11,9 +11,9 @@ export class LoginServices {
       throw error;
     }
   }
-  async getCart() {
+  async getCart(userId: number) {
     try {
-      const cart = await getData(_CART);
+      const cart = await getData(_CART, { id: userId });
       return cart;
     } catch (error) {
       throw error;

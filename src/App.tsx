@@ -1,5 +1,5 @@
-import Header from './components/Header';
-import Footer from './components/Footer';
+import Header from './components/Layout/Header';
+import Footer from './components/Layout/Footer';
 import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/auth/Login';
@@ -10,28 +10,33 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import ErrorPage from './pages/ErrorPage';
 import SingleProduct from './pages/SingleProduct';
-import { Auth } from './utils/auth';
+import { Auth, getCartQuantity } from './utils/auth';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginSuccess, logout } from './redux/slice/auth.slice';
 import { setTotalCart } from './redux/slice/cart.slice';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { RootState } from './redux/store/configureStore';
 import Account from './pages/Account';
+import Loading from './components/Loading';
 
 function App() {
   const dispatch = useDispatch();
   const isLogin = useSelector((state: RootState) => state.auth.isLogin);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const handleLogin = async () => {
       try {
+        setIsLoading(true);
         const res = await Auth();
+        setIsLoading(false);
         if (res) {
           dispatch(loginSuccess(res));
-          // const totalQuantityCart = await getCartQuantity();
-          // if (totalQuantityCart) dispatch(setTotalCart(totalQuantityCart));
+          const totalQuantityCart = await getCartQuantity();
+          if (totalQuantityCart) dispatch(setTotalCart(totalQuantityCart));
         }
       } catch (error) {
+        setIsLoading(false);
         dispatch(logout());
         dispatch(setTotalCart(0));
       }
@@ -42,20 +47,26 @@ function App() {
 
   return (
     <div className="App">
-      <Header />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/products" element={<Products />} />
-        <Route path="/products/:id" element={<SingleProduct />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/cart" element={isLogin ? <Cart /> : <Login />} />
-        <Route path="/account" element={isLogin ? <Account /> : <Login />} />
-        <Route path="/checkout" element={isLogin ? <Checkout /> : <Login />} />
-        <Route path="*" element={<ErrorPage />} />
-      </Routes>
-      <Footer />
+      {isLoading ? (
+        <Loading isLoading={isLoading} />
+      ) : (
+        <>
+          <Header />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/products/:id" element={<SingleProduct />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/cart" element={isLogin ? <Cart /> : <Login />} />
+            <Route path="/account" element={isLogin ? <Account /> : <Login />} />
+            <Route path="/checkout" element={isLogin ? <Checkout /> : <Login />} />
+            <Route path="*" element={<ErrorPage />} />
+          </Routes>
+          <Footer />
+        </>
+      )}
     </div>
   );
 }

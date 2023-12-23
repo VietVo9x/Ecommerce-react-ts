@@ -6,12 +6,12 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import './style.scss';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaShoppingCart, FaUserPlus, FaBars, FaWindowClose } from 'react-icons/fa';
-import { links } from '../../routes';
+import { links } from '../../../routes';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux/es/exports';
-import { logout } from '../../redux/slice/auth.slice';
-import { RootState } from '../../redux/store/configureStore';
-import { setTotalCart } from '../../redux/slice/cart.slice';
+import { logout } from '../../../redux/slice/auth.slice';
+import { RootState } from '../../../redux/store/configureStore';
+import { setTotalCart } from '../../../redux/slice/cart.slice';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
@@ -24,6 +24,7 @@ export default function Header() {
   const [showNavMobile, setShowNavMobile] = useState(false);
   const isLogin = useSelector((state: RootState) => state.auth.isLogin);
   const quantityCart = useSelector((state: RootState) => state.cart.quantity);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -149,7 +150,7 @@ export default function Header() {
             Cart
             <span className="nav__btns--cart-icon">
               <FaShoppingCart />
-              <span>{quantityCart}</span>
+              <span>{quantityCart >= 100 ? '99+' : quantityCart}</span>
             </span>
           </Link>
           {isLogin ? (

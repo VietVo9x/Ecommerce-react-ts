@@ -23,7 +23,7 @@ import { getData } from '../../utils/api.services';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { _CATEGORY, _PRODUCT } from '../../utils/constant.api';
 import { Res_Category, Res_Product } from '../../types/response.type';
-import { formatNumberToLocaleString, perPage } from '../../utils/constant';
+import { perPage } from '../../utils/constant';
 import ScrollToTopButton from '../../components/ScrollToTopButton';
 import CustomizedInputBase from '../../components/InputSearch';
 export default function Products() {

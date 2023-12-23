@@ -1,19 +1,52 @@
+import { CommentEntity, CreateCartEntity } from '../../types/entity';
 import { Req_ProductCart } from '../../types/request.type';
-import { getDataForID, insertData } from '../../utils/api.services';
-import { _CART_CREATE, _PRODUCT } from '../../utils/constant.api';
+import { getDataForID, postData } from '../../utils/api.services';
+import {
+  _CART,
+  _CART_CREATE,
+  _COMMENT,
+  _COMMENT_BY_PRODUCT,
+  _PRODUCT,
+  _PRODUCT_BY_ID,
+} from '../../utils/constant.api';
 
 export class SingleProductServices {
   async getProduct(id: string | number) {
     try {
-      const product = await getDataForID(_PRODUCT, id);
+      const product = await getDataForID(_PRODUCT_BY_ID, id);
       return product;
     } catch (error) {
       throw error;
     }
   }
-  async createCart(product: Req_ProductCart) {
+  async getCommentsByProduct(id: number) {
     try {
-      return await insertData(_CART_CREATE, product);
+      return await getDataForID(_COMMENT_BY_PRODUCT, id);
+    } catch (error) {
+      throw error;
+    }
+  }
+  async createCart(cart: CreateCartEntity) {
+    try {
+      return await postData(_CART, cart);
+    } catch (error) {
+      throw error;
+    }
+  }
+  validateComment(comment: CommentEntity) {
+    const error = {
+      isError: false,
+      msgError: '',
+    };
+    if (!comment.comment || comment.rate == 0) {
+      error.isError = true;
+      error.msgError = 'Please enter rating and comment';
+    }
+    return error;
+  }
+  async insertComment(comment: CommentEntity) {
+    try {
+      return await postData(_COMMENT, comment);
     } catch (error) {
       throw error;
     }

@@ -12,6 +12,7 @@ import { getData } from '../../utils/api.services';
 import { _VERIFY_TOKEN } from '../../utils/constant.api';
 import { Res_Error } from '../../types/error.res';
 import { ToastContainer, toast } from 'react-toastify';
+import PageHero from '../../components/PageHero';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -58,7 +59,6 @@ export default function Account() {
     getData(_VERIFY_TOKEN)
       .then((res) => {
         if (res) {
-          console.log(res);
           setUser(res);
         }
       })
@@ -69,44 +69,47 @@ export default function Account() {
   }, [flag]);
 
   return (
-    <Box
-      sx={{
-        flexGrow: 1,
-        bgcolor: 'background.paper',
-        display: 'flex',
-        height: '100vh',
-        width: '100vw',
-        paddingTop: '80px',
-      }}
-    >
-      <ToastContainer />
-      <Grid container>
-        <Grid item xs={3}>
-          <Tabs
-            orientation="vertical"
-            variant="scrollable"
-            value={value}
-            onChange={handleChange}
-            aria-label="Vertical tabs example"
-            sx={{ borderRight: 1, borderColor: 'divider' }}
-          >
-            <Tab label="Info User" {...a11yProps(0)} />
-            <Tab label="Change Password" {...a11yProps(1)} />
-            <Tab label="Avatar" {...a11yProps(2)} />
-          </Tabs>
+    <>
+      <PageHero title="Account" />
+      <Box
+        sx={{
+          flexGrow: 1,
+          bgcolor: 'background.paper',
+          display: 'flex',
+          height: '100vh',
+          width: '100vw',
+          paddingTop: '20px',
+        }}
+      >
+        <ToastContainer />
+        <Grid container>
+          <Grid item xs={3}>
+            <Tabs
+              orientation="vertical"
+              variant="scrollable"
+              value={value}
+              onChange={handleChange}
+              aria-label="Vertical tabs example"
+              sx={{ borderRight: 1, borderColor: 'divider' }}
+            >
+              <Tab label="Info User" {...a11yProps(0)} />
+              <Tab label="Change Password" {...a11yProps(1)} />
+              <Tab label="Avatar" {...a11yProps(2)} />
+            </Tabs>
+          </Grid>
+          <Grid item xs={6}>
+            <TabPanel value={value} index={0}>
+              <UpdateInfoUser user={user} setFlag={setFlag} flag={flag} />
+            </TabPanel>
+            <TabPanel value={value} index={1}>
+              <UpdatePasswordUser />
+            </TabPanel>
+            <TabPanel value={value} index={2}>
+              <UpdateAvatar flag={flag} setFlag={setFlag} />
+            </TabPanel>
+          </Grid>
         </Grid>
-        <Grid item xs={6}>
-          <TabPanel value={value} index={0}>
-            <UpdateInfoUser user={user} setFlag={setFlag} flag={flag} />
-          </TabPanel>
-          <TabPanel value={value} index={1}>
-            <UpdatePasswordUser />
-          </TabPanel>
-          <TabPanel value={value} index={2}>
-            <UpdateAvatar />
-          </TabPanel>
-        </Grid>
-      </Grid>
-    </Box>
+      </Box>
+    </>
   );
 }

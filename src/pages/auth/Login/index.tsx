@@ -17,6 +17,8 @@ import { loginSuccess } from '../../../redux/slice/auth.slice';
 import { setTotalCart } from '../../../redux/slice/cart.slice';
 import { calculateTotalQuantity } from '../../../utils/constant';
 import { displaySuccessMessage } from '../../../utils/display-success';
+import { displayError } from '../../../utils/display-error';
+import { Res_UserInfoLogin } from '../../../types/response.type';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -40,24 +42,19 @@ export default function Login() {
       if (retValidator.isError) {
         return;
       }
-      const responseLogin = await loginServices.onLogin(dataForm);
-      dispatch(loginSuccess(responseLogin));
+      const userLogin: Res_UserInfoLogin = await loginServices.onLogin(dataForm);
+      dispatch(loginSuccess(userLogin));
       displaySuccessMessage('Login successful');
 
       // Gọi API để lấy thông tin giỏ hàng sau khi đăng nhập thành công
-      // const cartResponse = await loginServices.getCart();
-      // if (cartResponse && Array.isArray(cartResponse.data)) {
-      //   const cartData = cartResponse.data;
-      //   const totalQuantity = calculateTotalQuantity(cartData);
-      //   dispatch(setTotalCart(totalQuantity));
-      // }
+      const cart = await loginServices.getCart(userLogin.id);
+      const totalQuantity = calculateTotalQuantity(cart);
+      console.log(totalQuantity);
+      dispatch(setTotalCart(totalQuantity));
 
       navigate('/');
     } catch (error) {
-      const newError = error as Res_Err_User_Login;
-      toast.error(newError.message, {
-        autoClose: 1000,
-      });
+      displayError(error);
     }
   };
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,7 +65,7 @@ export default function Login() {
 
   return (
     <div>
-      <PageHero title="Sign In" />
+      <PageHero path="/login" title="Sign In" />
       <Box
         sx={{
           my: 8,

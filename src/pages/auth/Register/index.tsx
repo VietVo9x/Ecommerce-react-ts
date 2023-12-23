@@ -10,8 +10,10 @@ import './style.scss';
 import RegisterServices from './register.service';
 import { Req_UserRegister } from '../../../types/request.type';
 import { Err_UserRegister } from '../../../types/error.type';
-import { Res_Err_User_Register } from '../../../types/error.res';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
+import { displayError } from '../../../utils/display-error';
+import { UserRegisterEntity } from '../../../types/entity';
+import { displaySuccessMessage } from '../../../utils/display-success';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -45,23 +47,19 @@ export default function Register() {
       if (responseValidate.isError) {
         return;
       }
+      const userRegister: UserRegisterEntity = {
+        email: dataForm.email,
+        user_name: dataForm.user_name,
+        password: dataForm.password,
+      };
 
-      const registerResponse = await registerServices.register(dataForm);
-
-      if (registerResponse) {
-        toast.success('Register Success', {
-          autoClose: 1000,
-        });
-
-        setTimeout(() => {
-          navigate('/login');
-        }, 3000);
-      }
+      await registerServices.register(userRegister);
+      displaySuccessMessage('You registered successfully');
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     } catch (error) {
-      const newError = error as Res_Err_User_Register;
-      toast.error(newError.message, {
-        autoClose: 1000,
-      });
+      displayError(error);
     }
   };
 
