@@ -92,7 +92,9 @@
     }
   }
 }
-th,
-td {
-  padding: 15px;
+.custom-row {
+  background-color: lightblue;
+  &:hover {
+    background-color: lightgreen;
+  }
 }

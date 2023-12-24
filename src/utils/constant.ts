@@ -23,3 +23,8 @@ export const totalPriceCart = (cart: Res_CartItem[]) => {
 export function formatCurrency(amount: number): string {
   return `$ ${amount.toFixed(2)}`;
 }
+
+//format date
+export const formatDate = (date: string) => {
+  return new Date(date).toLocaleDateString();
+};

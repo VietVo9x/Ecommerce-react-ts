@@ -1,11 +1,11 @@
 import { Req_Checkout_Address } from '../../types/request.type';
-import { insertData } from '../../utils/api.services';
-import { _ORDER_CREATE } from '../../utils/constant.api';
+import { postData } from '../../utils/api.services';
+import { _ORDER } from '../../utils/constant.api';
 
 export default class checkoutService {
   createOrder(addressForm: Req_Checkout_Address) {
     try {
-      return insertData(_ORDER_CREATE, addressForm);
+      return postData(_ORDER, addressForm);
     } catch (error) {
       throw error;
     }

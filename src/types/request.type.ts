@@ -13,7 +13,6 @@ export interface Req_ProductCart {
   quantity: number;
 }
 export interface Req_CartUpdate {
-  id: number;
   quantity: number;
 }
 export interface Req_Checkout_Address {

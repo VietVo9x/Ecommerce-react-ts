@@ -12,17 +12,16 @@ import { useDispatch, useSelector } from 'react-redux/es/exports';
 import { logout } from '../../../redux/slice/auth.slice';
 import { RootState } from '../../../redux/store/configureStore';
 import { setTotalCart } from '../../../redux/slice/cart.slice';
-import Tooltip from '@mui/material/Tooltip';
-import IconButton from '@mui/material/IconButton';
+
 import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
 import { Button, ClickAwayListener, Grow, MenuList, Paper, Popper } from '@mui/material';
 
 export default function Header() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const settings: string[] = ['Account', 'Logout'];
   const [showNavMobile, setShowNavMobile] = useState(false);
   const isLogin = useSelector((state: RootState) => state.auth.isLogin);
+  const user = useSelector((state: RootState) => state.auth.user);
   const quantityCart = useSelector((state: RootState) => state.cart.quantity);
 
   const dispatch = useDispatch();
@@ -46,20 +45,23 @@ export default function Header() {
   }
 
   // return focus to the button when we transitioned from !open -> open
+
   const prevOpen = React.useRef(open);
   React.useEffect(() => {
-    if (prevOpen.current === true && open === false) {
-      anchorRef.current!.focus();
+    if (anchorRef.current) {
+      anchorRef.current.focus(); // Tránh lỗi "Cannot read properties of null (reading 'focus')"
     }
+
     prevOpen.current = open;
   }, [open]);
 
   // Mui menu account start
 
-  const handleClose = (event: any) => {
+  const handleClose = (event: Event | React.SyntheticEvent) => {
     if (anchorRef.current && anchorRef.current.contains(event.target as HTMLElement)) {
       return;
     }
+
     setOpen(false);
   };
 
@@ -164,11 +166,7 @@ export default function Header() {
                   aria-haspopup="true"
                   onClick={handleToggle}
                 >
-                  <Tooltip title="Open settings">
-                    <IconButton sx={{ p: 0 }}>
-                      <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-                    </IconButton>
-                  </Tooltip>
+                  <Avatar alt="Remy Sharp" src={user.avatar} />
                 </Button>
                 <Popper
                   open={open}
@@ -193,15 +191,19 @@ export default function Header() {
                             aria-labelledby="composition-button"
                             onKeyDown={handleListKeyDown}
                           >
+                            <MenuItem onClick={handleClose}>
+                              <Link to={'/account'} style={{ color: 'inherit' }}>
+                                My account
+                              </Link>
+                            </MenuItem>
                             <MenuItem
-                              onClick={() => {
+                              onClick={(event) => {
                                 handleClose(event);
-                                navigate('/account');
+                                handleLogout();
                               }}
                             >
-                              My account
+                              Logout
                             </MenuItem>
-                            <MenuItem onClick={handleLogout}>Logout</MenuItem>
                           </MenuList>
                         </ClickAwayListener>
                       </Paper>

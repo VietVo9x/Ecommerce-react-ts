@@ -1,9 +1,7 @@
 import { CommentEntity, CreateCartEntity } from '../../types/entity';
-import { Req_ProductCart } from '../../types/request.type';
-import { getDataForID, postData } from '../../utils/api.services';
+import { getData, getDataForID, postData } from '../../utils/api.services';
 import {
   _CART,
-  _CART_CREATE,
   _COMMENT,
   _COMMENT_BY_PRODUCT,
   _PRODUCT,
@@ -29,6 +27,13 @@ export class SingleProductServices {
   async createCart(cart: CreateCartEntity) {
     try {
       return await postData(_CART, cart);
+    } catch (error) {
+      throw error;
+    }
+  }
+  async getCart() {
+    try {
+      return await getData(_CART);
     } catch (error) {
       throw error;
     }

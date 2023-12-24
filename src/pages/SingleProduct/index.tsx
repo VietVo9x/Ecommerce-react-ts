@@ -25,7 +25,6 @@ import { initialProduct } from '../../utils/common/initial-state';
 export default function SingleProduct() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const singleProductService = new SingleProductServices();
-  const value: number | null = 2;
   const [quantityInput, setQuantityInput] = useState(1);
   const [product, setProduct] = useState<Res_Product>(initialProduct);
   const [image, setImage] = useState<string>();
@@ -77,8 +76,9 @@ export default function SingleProduct() {
         userId: user.id,
         quantity: quantityInput,
       };
-      const insertProductCart = await singleProductService.createCart(cart);
-      dispatch(setTotalCart(insertProductCart.quantity));
+      await singleProductService.createCart(cart);
+      const newCart = await singleProductService.getCart();
+      dispatch(setTotalCart(calculateTotalQuantity(newCart)));
       displaySuccessMessage('Product added successfully');
     } catch (error) {
       displayError(error);
@@ -94,84 +94,86 @@ export default function SingleProduct() {
   };
 
   return (
-    product.id > 0 && (
-      <>
-        <ScrollToTopButton />
-        <ToastContainer />
-        <PageHero path="/products" title={`Products`} subtitle={product.product_name} />
-        <section className="container">
-          <div className="btn--back">
-            <Link to="/products">BACK TO PRODUCTS</Link>
-          </div>
-          <div className="product">
-            <div className="product__images">
-              <div className="product__images--main">
-                <img src={image} alt="anh chinh" />
+    <div>
+      {product.id > 0 && (
+        <>
+          <ScrollToTopButton />
+          <ToastContainer />
+          <PageHero path="/products" title={`Products`} subtitle={product.product_name} />
+          <section className="container">
+            <div className="btn--back">
+              <Link to="/products">BACK TO PRODUCTS</Link>
+            </div>
+            <div className="product">
+              <div className="product__images">
+                <div className="product__images--main">
+                  <img src={image} alt="anh chinh" />
+                </div>
+                <div className="product__images--sub">
+                  {product &&
+                    product.images.map((image, index) => (
+                      <img
+                        key={index}
+                        src={image.imageUrl}
+                        alt={image.imageUrl}
+                        onClick={() => {
+                          setBigImageProduct(image.imageUrl);
+                        }}
+                      />
+                    ))}
+                </div>
               </div>
-              <div className="product__images--sub">
-                {product &&
-                  product.images.map((image, index) => (
-                    <img
-                      key={index}
-                      src={image.imageUrl}
-                      alt={image.imageUrl}
-                      onClick={() => {
-                        setBigImageProduct(image.imageUrl);
-                      }}
+              <div className="product__content">
+                <Typography component={'h4'} variant="h5">
+                  {product?.product_name}
+                </Typography>
+                <div className="product__content--rating">
+                  <span>
+                    <Rating name="read-only" value={calAverageRating()} readOnly />
+                  </span>
+                  <span>({comments.length} customer reviews)</span>
+                </div>
+                <Typography component={'h2'} variant="h5" pt={2}>
+                  {formatCurrency(product.price)}
+                </Typography>
+                <p className="product__content--desc"> {product?.description}</p>
+                <p className="product__content--info">
+                  <span>Available :</span>
+                  {product?.quantity_stock}
+                </p>
+                <p className="product__content--info">
+                  <span>Category :</span>
+                  {product.category.name}
+                </p>
+                <div className="product__content--action">
+                  <button onClick={() => handleQuantity('down')} disabled={quantityInput === 1}>
+                    -
+                  </button>
+                  {quantityInput && (
+                    <input
+                      type="text"
+                      value={
+                        quantityInput > product.quantity_stock
+                          ? product.quantity_stock
+                          : quantityInput
+                      }
+                      onChange={(e) => handleChangeQuantity(e)}
                     />
-                  ))}
-              </div>
-            </div>
-            <div className="product__content">
-              <Typography component={'h4'} variant="h5">
-                {product?.product_name}
-              </Typography>
-              <div className="product__content--rating">
-                <span>
-                  <Rating name="read-only" value={calAverageRating()} readOnly />
-                </span>
-                <span>({comments.length} customer reviews)</span>
-              </div>
-              <Typography component={'h2'} variant="h5" pt={2}>
-                {formatCurrency(product.price)}
-              </Typography>
-              <p className="product__content--desc"> {product?.description}</p>
-              <p className="product__content--info">
-                <span>Available :</span>
-                {product?.quantity_stock}
-              </p>
-              <p className="product__content--info">
-                <span>Category :</span>
-                {product.category.name}
-              </p>
-              <div className="product__content--action">
-                <button onClick={() => handleQuantity('down')} disabled={quantityInput === 1}>
-                  -
+                  )}
+                  <button onClick={() => handleQuantity('up')}>+</button>
+                </div>
+                <button onClick={handleAddToCart} disabled={product.quantity_stock === 0}>
+                  ADD TO CART
                 </button>
-                {quantityInput && (
-                  <input
-                    type="text"
-                    value={
-                      quantityInput > product.quantity_stock
-                        ? product.quantity_stock
-                        : quantityInput
-                    }
-                    onChange={(e) => handleChangeQuantity(e)}
-                  />
-                )}
-                <button onClick={() => handleQuantity('up')}>+</button>
               </div>
-              <button onClick={handleAddToCart} disabled={product.quantity_stock === 0}>
-                ADD TO CART
-              </button>
             </div>
-          </div>
-        </section>
-        <Stack sx={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <Comment product={product} reload={reload} setReload={setReload} />
-          <ListComment comments={comments} />
-        </Stack>
-      </>
-    )
+          </section>
+          <Stack sx={{ maxWidth: '1200px', margin: '0 auto' }}>
+            <Comment product={product} reload={reload} setReload={setReload} />
+            <ListComment comments={comments} />
+          </Stack>
+        </>
+      )}
+    </div>
   );
 }

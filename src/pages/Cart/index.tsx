@@ -1,65 +1,56 @@
-import { Button } from '@mui/material';
+import {
+  Button,
+  Paper,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  makeStyles,
+} from '@mui/material';
 import PageHero from '../../components/PageHero';
 import './style.scss';
 import { useDispatch } from 'react-redux';
 import { CartServices } from './cart.service';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Res_Cart } from '../../types/response.type';
-import {
-  calculateTotalQuantity,
-  formatNumberToLocaleString,
-  totalPriceCart,
-} from '../../utils/constant';
+import { Res_CartItem } from '../../types/response.type';
+import { calculateTotalQuantity, formatCurrency, totalPriceCart } from '../../utils/constant';
 import { setTotalCart } from '../../redux/slice/cart.slice';
+import { displayError } from '../../utils/display-error';
+
 export default function Cart() {
-  const [cart, setCart] = useState<Res_Cart[]>([]);
+  const [cart, setCart] = useState<Res_CartItem[]>([]);
+
   const dispatch = useDispatch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const cartServices = new CartServices();
-  const navigate = useNavigate();
   //tang giam so luong
   const handleUpdateQty = async (condition: 'up' | 'down', id: number, qty: number) => {
     const cartUpdate = {
-      id: id,
       quantity: qty,
     };
-    if (condition === 'up') {
-      cartUpdate.quantity = qty + 1;
-      cartServices
-        .updateProductCart(id, cartUpdate)
-        .then((res) => {
-          if (res) {
-            const updatedCart = cart.map((item) =>
-              item.id === id ? { ...item, quantity: res.data.quantity } : item,
-            );
-            const totalQuantity = calculateTotalQuantity(updatedCart);
-            dispatch(setTotalCart(totalQuantity));
+    try {
+      if (condition == 'up') {
+        cartUpdate.quantity = qty + 1;
+      } else if (condition == 'down') {
+        if (qty === 1) return;
+        cartUpdate.quantity = qty - 1;
+      }
 
-            setCart(updatedCart);
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } else if (condition === 'down') {
-      cartUpdate.quantity = qty - 1;
-      cartServices
-        .updateProductCart(id, cartUpdate)
-        .then((res) => {
-          if (res) {
-            const updatedCart = cart.map((item) =>
-              item.id === id ? { ...item, quantity: res.data.quantity } : item,
-            );
-            const totalQuantity = calculateTotalQuantity(updatedCart);
-            dispatch(setTotalCart(totalQuantity));
-            setCart(updatedCart);
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      const resUpdateCart = await cartServices.updateProductCart(id, cartUpdate);
+      const updatedCart = cart.map((item) =>
+        item.id == id ? { ...item, quantity: resUpdateCart.quantity } : item,
+      );
+      const totalQuantity = calculateTotalQuantity(updatedCart);
+      dispatch(setTotalCart(totalQuantity));
+      setCart(updatedCart);
+    } catch (error) {
+      displayError(error);
     }
   };
 
@@ -75,7 +66,7 @@ export default function Cart() {
       dispatch(setTotalCart(totalQuantity));
       setCart(updatedCart);
     } catch (error) {
-      console.error('Failed to delete product:', error);
+      displayError(error);
     }
   };
   //clear cart
@@ -87,10 +78,9 @@ export default function Cart() {
       await cartServices.clearCart();
       const totalQuantity = calculateTotalQuantity([]);
       dispatch(setTotalCart(totalQuantity));
-
       setCart([]);
     } catch (error) {
-      console.error('Failed to clear cart:', error);
+      displayError(error);
     }
   };
 
@@ -98,64 +88,96 @@ export default function Cart() {
     cartServices
       .getCart()
       .then((res) => {
-        setCart(res?.data);
+        setCart(res);
+        const totalQuantity = calculateTotalQuantity(res);
+        dispatch(setTotalCart(totalQuantity));
       })
       .catch((error) => {
-        navigate('/login');
+        displayError(error);
       });
   }, []);
+
   return (
     <div>
       <PageHero title="Cart" />
-
       {cart && cart.length > 0 ? (
-        <section className="cart">
-          <table className="cart__table">
-            <thead>
-              <tr>
-                <th>Image</th>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Subtotal</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cart &&
-                cart.map((item: Res_Cart, index: number) => (
-                  <tr key={index}>
-                    <td>
-                      <img src={item.product.imageProducts[0].image_url} alt="" />
-                    </td>
-                    <td>{item.product.product_name}</td>
-                    <td>$ {formatNumberToLocaleString(item.product.price)}</td>
-                    <td className="cart__table--value">
-                      <Button
-                        variant="text"
-                        onClick={() => handleUpdateQty('down', item.id, item.quantity)}
-                        disabled={item.quantity === 1}
+        <>
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow className={'custom-row'}>
+                  <TableCell scope="center">Image</TableCell>
+                  <TableCell align="center">Name</TableCell>
+                  <TableCell align="center">Price</TableCell>
+                  <TableCell align="center">Quantity</TableCell>
+                  <TableCell align="center">Subtitle</TableCell>
+                  <TableCell align="center">Action</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {cart &&
+                  cart.map((item, index) => (
+                    <TableRow key={index} style={{ tableLayout: 'fixed' }}>
+                      <TableCell align="center">
+                        <img
+                          src={item.product.images[0].imageUrl}
+                          alt=""
+                          width={100}
+                          height={100}
+                        />
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        sx={{
+                          width: '30%',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                        width={'33%'}
                       >
-                        <span>-</span>
-                      </Button>
-                      <h2>{item.quantity}</h2>
-                      <Button
-                        variant="text"
-                        onClick={() => handleUpdateQty('up', item.id, item.quantity)}
-                      >
-                        <span>+</span>
-                      </Button>
-                    </td>
-                    <td>$ {formatNumberToLocaleString(item.quantity * item.product.price)}</td>
-                    <td>
-                      <Button variant="text" color="error" onClick={() => handleDelete(item.id)}>
-                        <DeleteIcon />
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
+                        {item.product.product_name}
+                      </TableCell>
+                      <TableCell align="center" width={'20%'}>
+                        {formatCurrency(item.product.price)}
+                      </TableCell>
+                      <TableCell align="center" valign="middle" width={'20%'}>
+                        <Stack alignItems={'center'} justifyContent={'center'} direction={'row'}>
+                          <Button
+                            variant="text"
+                            style={{ flex: '1', height: '56px', fontSize: '30px' }}
+                            onClick={() => handleUpdateQty('down', item.id, item.quantity)}
+                          >
+                            -
+                          </Button>
+                          <TextField
+                            fullWidth
+                            value={item.quantity}
+                            style={{ flex: '2' }}
+                            InputProps={{ style: { flex: '2' } }}
+                          />
+                          <Button
+                            variant="text"
+                            style={{ flex: '1', height: '56px', fontSize: '30px' }}
+                            onClick={() => handleUpdateQty('up', item.id, item.quantity)}
+                          >
+                            +
+                          </Button>
+                        </Stack>
+                      </TableCell>
+                      <TableCell align="center" width={'20%'}>
+                        {formatCurrency(item.quantity * item.product.price)}
+                      </TableCell>
+
+                      <TableCell align="center">
+                        <Button variant="text" color="error" onClick={() => handleDelete(item.id)}>
+                          <DeleteIcon />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
           <div className="cart__btns">
             <Button variant="contained" color="secondary">
               <Link to={'/products'}>Continue Shopping</Link>
@@ -165,23 +187,11 @@ export default function Cart() {
             </Button>
           </div>
           <div className="cart__checkout">
-            {/* <h5
-              className="
-          cart__checkout--item"
-            >
-              Subtotal : <span>$ 100.00</span>
-            </h5>
-            <p
-              className="
-          cart__checkout--item"
-            >
-              Shipping Fee : <span>$ 5.34</span>
-            </p> */}
             <h4
               className="
-          cart__checkout--item"
+         cart__checkout--item"
             >
-              Order Total : <span>$ {formatNumberToLocaleString(totalPriceCart(cart))}</span>
+              Order Total : <span>{formatCurrency(totalPriceCart(cart))}</span>
             </h4>
             <div className="cart__checkout--btn">
               <Button variant="contained" color="success" fullWidth>
@@ -189,7 +199,7 @@ export default function Cart() {
               </Button>
             </div>
           </div>
-        </section>
+        </>
       ) : (
         <section className="cart--empty">
           <h1>Your cart is empty</h1>

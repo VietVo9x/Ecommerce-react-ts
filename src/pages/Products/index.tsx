@@ -7,113 +7,109 @@ import Typography from '@mui/material/Typography';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 import FormGroup from '@mui/material/FormGroup';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 
 import './style.scss';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { getData } from '../../utils/api.services';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { _CATEGORY, _PRODUCT } from '../../utils/constant.api';
 import { Res_Category, Res_Product } from '../../types/response.type';
-import { perPage } from '../../utils/constant';
+import { formatCurrency, perPage } from '../../utils/constant';
 import ScrollToTopButton from '../../components/ScrollToTopButton';
 import CustomizedInputBase from '../../components/InputSearch';
+import { NativeSelect } from '@mui/material';
 export default function Products() {
-  const [categorys, setCategorys] = useState<Res_Category[]>([]);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [count, setCount] = useState(0);
-  const [searchValue, setSearchValue] = useState<string>('');
+  const [categories, setCategories] = useState<Res_Category[]>([]);
+  const [category, setCategory] = useState<string>('');
   const [products, setProducts] = useState<Res_Product[]>([]);
-  const [sortValue, setSortValue] = useState('');
-  const [sortOrder, setSortOrder] = useState('');
-  const page = Number(searchParams.get('page')) || 1;
-  const cate = searchParams.get('category') || '';
-  const search = searchParams.get('search') || '';
-  const params: any = {};
-  searchParams.forEach((value, key) => {
-    params[key] = value;
-  });
-
-  //mui
-  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    setSearchParams({ ...params, page: value.toString() });
-    setCount(() => Math.ceil(products.length / perPage));
-  };
-
-  const handleSearch = () => {
-    setSearchParams({ ...params, search: searchValue, page: 1 });
-  };
-  const clearSearch = () => {
-    setSearchParams({ ...params, search: '' });
-    setSearchValue('');
-  };
   const [age, setAge] = React.useState('');
 
-  //lay data category
-  useEffect(() => {
+  //filter data start
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchValue, setSearchValue] = useState<string>('');
+  const [count, setCount] = useState(0);
+
+  const page = Number(searchParams.get('page')) || 1;
+  const params = React.useRef<{ [key: string]: any }>({ limit: 10 });
+  React.useEffect(() => {
+    searchParams.forEach((value, key) => {
+      params.current[key] = value;
+    });
+    getData(_PRODUCT, params.current).then((res: any) => {
+      setProducts(res?.products);
+      setCount(Math.ceil(res?.total / perPage));
+    });
+  }, [searchParams]);
+  React.useEffect(() => {
     getData(_CATEGORY).then((res) => {
-      setCategorys(res?.data);
+      setCategories(res.categories);
     });
-  }, []);
-  //data products
-  useEffect(() => {
-    getData(
-      `/product?page=${page}&limit=${perPage}&search=${search}&category=${cate}&sort=${sortValue}&order=${sortOrder}`,
-    ).then((res) => {
-      setCount(Math.ceil(Number(res?.headers['x-total-products']) / perPage));
-      setProducts([...res?.data]);
-    });
-  }, [page, search, cate, sortValue, sortOrder]);
-
-  const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // setValue((event.target as HTMLInputElement).value);
-    setSearchParams({ ...params, category: event.target.value, page: 1 });
-    setCount(Math.ceil(products.length / perPage));
+  }, [searchParams]);
+  //thay doi trang
+  const handleChangePage = (event: React.ChangeEvent<unknown>, value: number) => {
+    setSearchParams({ ...params.current, page: value.toString() });
   };
-
-  const handleChangeSelect = (event: SelectChangeEvent) => {
-    setSearchParams({ ...params, page: '1' });
+  //tim kiem
+  const handleSearch = () => {
+    setSearchParams({ ...params.current, search_name: searchValue, page: '1' });
+  };
+  const clearSearch = () => {
+    setSearchParams({ ...params.current, search_name: '' });
+    setSearchValue('');
+  };
+  //sort
+  const handleChangeSelect: React.ChangeEventHandler<HTMLSelectElement> = (event) => {
     setAge(event.target.value);
-    setCount(Math.ceil(products.length / perPage));
-
     switch (event.target.value.toString()) {
       case '1':
-        setSortValue('product_name');
-        setSortOrder('ASC');
+        setSearchParams({
+          ...params.current,
+          page: '1',
+          sort: 'name',
+          order: 'ASC',
+        });
         break;
-
       case '2':
-        setSortValue('product_name');
-        setSortOrder('DESC');
+        setSearchParams({
+          ...params.current,
+          page: '1',
+          sort: 'name',
+          order: 'DESC',
+        });
+
         break;
 
       case '3':
-        setSortValue('price');
-        setSortOrder('ASC');
-
+        setSearchParams({ ...params.current, page: '1', sort: 'price', order: 'ASC' });
         break;
       case '4':
-        setSortValue('price');
-        setSortOrder('DESC');
+        setSearchParams({ ...params.current, page: '1', sort: 'price', order: 'DESC' });
+        break;
+      default:
+        setSearchParams({ ...params.current, page: '1', sort: '', order: '' });
         break;
     }
   };
+  //filter data end
 
   //filter
+  const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchParams({ ...params.current, category: event.target.value, page: '1' });
+    setCount(Math.ceil(products.length / perPage));
+    setCategory(event.target.value);
+  };
 
   //handle view
   const navigate = useNavigate();
   const handleView = (id: number) => {
     navigate('/products/' + id);
   };
+
   return (
     <div>
       <ScrollToTopButton />
@@ -134,17 +130,17 @@ export default function Products() {
             <RadioGroup
               aria-labelledby="demo-error-radios"
               name="quiz"
-              value={cate}
+              value={category}
               onChange={handleRadioChange}
             >
               <FormControlLabel value="" control={<Radio />} label="All" />
 
-              {categorys &&
-                categorys.map((element, index) => (
+              {categories &&
+                categories.map((element: Res_Category, index: number) => (
                   <FormControlLabel
                     value={element.id}
                     control={<Radio />}
-                    label={element.category_name}
+                    label={element.name}
                     key={index}
                   />
                 ))}
@@ -152,21 +148,22 @@ export default function Products() {
           </FormGroup>
         </div>
         <div>
-          <Box sx={{ width: '300px', marginLeft: 'auto' }} pb={5}>
-            <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label">Sort By...</InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={age}
-                label="Sort By..."
+          <Box sx={{ minWidth: 150, marginRight: 10, marginBottom: '20px' }}>
+            <FormControl>
+              <NativeSelect
+                defaultValue={age}
+                inputProps={{
+                  name: 'age',
+                  id: 'uncontrolled-native',
+                }}
                 onChange={handleChangeSelect}
               >
-                <MenuItem value={1}>Name (A - Z)</MenuItem>
-                <MenuItem value={2}>Name (Z - A)</MenuItem>
-                <MenuItem value={3}>Price(Lowest)</MenuItem>
-                <MenuItem value={4}>Price(Highest)</MenuItem>
-              </Select>
+                <option value={''}>Sort</option>
+                <option value={1}>Name (A - Z)</option>
+                <option value={2}>Name (Z - A)</option>
+                <option value={3}>Price(Lowest)</option>
+                <option value={4}>Thirty(Highest)</option>
+              </NativeSelect>
             </FormControl>
           </Box>
 
@@ -175,15 +172,20 @@ export default function Products() {
               products.map((product) => (
                 <div className="products--content__item" key={product.id}>
                   <div className="products--content__item--image">
-                    {product.imageProducts.map((image, index) => (
-                      <img src={image.image_url} alt={image.image_url} key={index} />
+                    {product.images.map((image, index) => (
+                      <img src={image.imageUrl} alt={image.imageUrl} key={index} />
                     ))}
                   </div>
-                  <h5 className="products--content__item--title">{product.product_name}</h5>
+                  <h5
+                    className="products--content__item--title"
+                    onClick={() => handleView(product.id)}
+                  >
+                    {product.product_name}
+                  </h5>
 
                   <div className="products--content__item--action">
                     <div className="products--content__item--price">
-                      <p>$ {formatNumberToLocaleString(product.price)}</p>
+                      <p>{formatCurrency(product.price)}</p>
                     </div>
 
                     <Tooltip
@@ -202,7 +204,7 @@ export default function Products() {
           </div>
           {/* phan trang */}
           <Stack spacing={2} mt={2}>
-            <Pagination count={count} page={page || 1} onChange={handleChange} />
+            <Pagination count={count} page={page || 1} onChange={handleChangePage} />
           </Stack>
         </div>
       </div>

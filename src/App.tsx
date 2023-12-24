@@ -32,8 +32,8 @@ function App() {
         setIsLoading(false);
         if (res) {
           dispatch(loginSuccess(res));
-          const totalQuantityCart = await getCartQuantity();
-          if (totalQuantityCart) dispatch(setTotalCart(totalQuantityCart));
+          const cart = await getCartQuantity();
+          if (cart) dispatch(setTotalCart(cart));
         }
       } catch (error) {
         setIsLoading(false);

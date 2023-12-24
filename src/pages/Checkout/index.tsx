@@ -11,28 +11,27 @@ import Typography from '@mui/material/Typography';
 import AddressForm from './AddressForm';
 import Review from './Review';
 import { useDispatch, useSelector } from 'react-redux';
-import { Res_Cart, Res_UserInfoLogin } from '../../types/response.type';
+import { Res_CartItem, Res_UserInfoLogin } from '../../types/response.type';
 import PageHero from '../../components/PageHero';
 import { Req_Checkout_Address } from '../../types/request.type';
-import { _CART, _ORDER_CREATE } from '../../utils/constant.api';
-import { getData, insertData } from '../../utils/api.services';
+import { _CART, _ORDER } from '../../utils/constant.api';
+import { getData, postData } from '../../utils/api.services';
 import { Link } from 'react-router-dom';
 import './style.scss';
 import { setTotalCart } from '../../redux/slice/cart.slice';
 import { Res_Error } from '../../types/error.res';
 import { ToastContainer, toast } from 'react-toastify';
+import { displayError } from '../../utils/display-error';
 
 const steps = ['Shipping address', 'Review your order'];
 
 export default function Checkout() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [isError, setIsError] = React.useState(true);
-  const [cart, setCart] = React.useState<Res_Cart[]>([]);
+  const [cart, setCart] = React.useState<Res_CartItem[]>([]);
   const dispatch = useDispatch();
 
-  const user = useSelector(
-    (state: { auth: { user: Res_UserInfoLogin | null } }) => state.auth.user,
-  );
+  const user = useSelector((state: { auth: { user: Res_UserInfoLogin } }) => state.auth.user);
   const [addressForm, setAddressForm] = React.useState<Req_Checkout_Address>({
     full_name: user?.full_name || '',
     address: user?.address || '',
@@ -61,13 +60,10 @@ export default function Checkout() {
     setActiveStep(activeStep + 1);
     if (activeStep === 1) {
       try {
-        await insertData(_ORDER_CREATE, addressForm);
+        await postData(_ORDER, addressForm);
         dispatch(setTotalCart(0));
       } catch (error) {
-        const newError = error as Res_Error;
-        toast.error(newError.message, {
-          autoClose: 1000,
-        });
+        displayError(error);
       }
     }
   };
@@ -79,7 +75,7 @@ export default function Checkout() {
   React.useEffect(() => {
     getData(_CART).then((res) => {
       if (res) {
-        setCart(res.data);
+        setCart(res);
       }
     });
   }, []);

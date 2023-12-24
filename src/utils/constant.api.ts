@@ -11,12 +11,9 @@ const _PRODUCT_BY_ID = '/products';
 const _COMMENT = '/reviews';
 const _COMMENT_BY_PRODUCT = '/reviews/by-product';
 const _CART = '/shopping-cart';
-const _CART_CREATE = '/cart/create';
-const _CART_UPDATE = '/cart/update/';
-const _CART_DELETE_ITEM = '/cart/delete-item/';
-const _CART_CLEAR = '/cart/delete-all/';
-const _ORDER = '/order';
-const _ORDER_CREATE = '/order/create';
+const _CART_DELETE_ITEM = '/shopping-cart/cart-item/';
+const _CART_CLEAR_ALL = '/shopping-cart/clear-cart/';
+const _ORDER = '/orders';
 export {
   _USER,
   _USER_REGISTER,
@@ -26,12 +23,9 @@ export {
   _CATEGORY,
   _PRODUCT,
   _CART,
-  _CART_CREATE,
-  _CART_CLEAR,
   _CART_DELETE_ITEM,
-  _CART_UPDATE,
+  _CART_CLEAR_ALL,
   _ORDER,
-  _ORDER_CREATE,
   _PROFILE_UPDATE_INFO,
   _PROFILE_UPDATE_AVATAR,
   _PRODUCT_BY_ID,
