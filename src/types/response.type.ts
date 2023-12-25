@@ -10,7 +10,6 @@ export interface Res_UserInfoLogin {
   role: number;
   email: string;
   phone: string;
-  address: string;
   avatar: string;
   createdAt: string;
   updatedAt: string;
@@ -62,4 +61,31 @@ export interface Res_CartItem {
   createdAt: string;
   updatedAt: string;
   product: Res_Product;
+}
+export interface Res_ShippingAddress {
+  id: number;
+  address: string;
+  phone: string;
+  useId?: number;
+  name: string;
+}
+export interface Res_Orders {
+  id: number;
+  userId: number;
+  status: false;
+  all_price: number;
+  createdAt: string;
+  updatedAt: string;
+  shippingAddressId: number;
+  orderDetails: Res_OrderDetail[];
+  shippingAddress: Res_ShippingAddress;
+}
+export interface Res_OrderDetail {
+  id: number;
+  name: string;
+  image: string;
+  quantity: number;
+  productId: number;
+  total_price: number;
+  orderId: number;
 }

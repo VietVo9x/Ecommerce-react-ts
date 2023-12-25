@@ -148,7 +148,7 @@ export default function Products() {
           </FormGroup>
         </div>
         <div>
-          <Box sx={{ minWidth: 150, marginRight: 10, marginBottom: '20px' }}>
+          <Box sx={{ minWidth: 150, marginRight: 10, marginBottom: '20px', textAlign: 'right' }}>
             <FormControl>
               <NativeSelect
                 defaultValue={age}

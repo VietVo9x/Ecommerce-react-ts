@@ -24,3 +24,9 @@ export interface Err_Update_PasswordForm {
   msgNewPassword: string;
   msgConfirmPassword: string;
 }
+export interface Err_Shipping_AddressForm {
+  isError: boolean;
+  msgName: string;
+  msgPhone: string;
+  msgAddress: string;
+}

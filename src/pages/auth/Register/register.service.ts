@@ -30,7 +30,7 @@ export default class RegisterServices {
     }
 
     //check user name
-    const regex = /^[a-zA-Z]*$/;
+    const regex = /^[a-zA-Z0-9]*$/;
     if (!dataForm.user_name) {
       error.isError = true;
       error.msgUserName = 'User Name cannot be empty';

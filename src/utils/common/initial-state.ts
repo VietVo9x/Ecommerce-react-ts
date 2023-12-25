@@ -32,3 +32,10 @@ export const initialProduct = {
   images: [],
   category: { id: 0, name: '', description: '', status: false, isDelete: false },
 };
+export const initialShippingAddress = {
+  id: 0,
+  address: '',
+  phone: '',
+  useId: 0,
+  name: '',
+};

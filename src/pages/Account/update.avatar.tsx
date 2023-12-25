@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/alt-text */
 import { Button, FormHelperText } from '@mui/material';
 import React, { useState, ChangeEvent, useEffect } from 'react';
 import { useSelector } from 'react-redux';
@@ -15,6 +16,7 @@ interface Props {
 export default function UpdateAvatar(props: Props) {
   const user = useSelector((state: RootState) => state.auth.user);
   const accountService = new AccountService();
+  const [isLoading, setIsLoading] = useState(false);
   const [image, setImage] = useState<string>('');
   const [file, setFile] = useState<File | undefined>();
   const [error, setError] = useState({
@@ -43,12 +45,17 @@ export default function UpdateAvatar(props: Props) {
     }
   };
   const handleSubmit = async () => {
+    setIsLoading(true);
     try {
       if (file) {
         const resultError = accountService.validateFile(file);
         setError(resultError);
-        if (resultError.isError) return;
+        if (resultError.isError) {
+          setIsLoading(false);
+          return;
+        }
         if (user) await accountService.UpdateAvatar((user as Res_UserInfoLogin).id, file);
+        setIsLoading(false);
         displaySuccessMessage('You update avatar successfully');
         props.setFlag(!props.flag);
       } else {
@@ -58,13 +65,14 @@ export default function UpdateAvatar(props: Props) {
         });
       }
     } catch (error) {
+      setIsLoading(false);
       displayError(error);
     }
   };
 
   return (
     <div>
-      <img alt="preview image" src={image} width={300} height={300} />
+      <img src={image} width={300} height={300} alt="avatar" />
       <input
         type="file"
         onChange={onImageChange}
@@ -81,6 +89,7 @@ export default function UpdateAvatar(props: Props) {
         </label>
         {showSaveButton && (
           <Button
+            disabled={isLoading}
             sx={{ marginLeft: '10px' }}
             variant="contained"
             color="success"

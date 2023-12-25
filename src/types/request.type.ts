@@ -15,22 +15,28 @@ export interface Req_ProductCart {
 export interface Req_CartUpdate {
   quantity: number;
 }
-export interface Req_Checkout_Address {
-  full_name: string;
-  address: string;
-  phone: string;
-  province: string;
-  city: string;
-}
 export interface Req_UserUpdate {
   email: string;
   user_name: string;
   full_name: string;
   phone: string;
-  address: string;
 }
 export interface Req_UpdatePassword {
   oldPassword: string;
   newPassword: string;
   confirmPassword: string;
+}
+export interface Req_ShoppingCartOrder {
+  name: string;
+  image: string;
+  quantity: number;
+  productId: number;
+  total_price: number;
+}
+export interface Req_ShippingAddress {
+  id: number;
+  address: string;
+  phone: string;
+  useId?: number;
+  name: string;
 }

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Rating from '@mui/material/Rating';
 import Typography from '@mui/material/Typography';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useEffect } from 'react';
 
 import './style.scss';

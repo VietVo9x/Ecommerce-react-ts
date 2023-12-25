@@ -7,12 +7,15 @@ import UpdateInfoUser from './update.info.user';
 import Grid from '@mui/material/Grid';
 import UpdatePasswordUser from './update.password.user';
 import UpdateAvatar from './update.avatar';
-import { Res_UserInfoLogin } from '../../types/response.type';
+import { Res_Orders, Res_UserInfoLogin } from '../../types/response.type';
 import { getData } from '../../utils/api.services';
-import { _VERIFY_TOKEN } from '../../utils/constant.api';
+import { _MY_ORDER, _VERIFY_TOKEN } from '../../utils/constant.api';
 import { Res_Error } from '../../types/error.res';
 import { ToastContainer, toast } from 'react-toastify';
 import PageHero from '../../components/PageHero';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../../redux/slice/auth.slice';
+import MyOrder from './my.order';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -48,9 +51,11 @@ function a11yProps(index: number) {
 }
 
 export default function Account() {
+  const dispatch = useDispatch();
   const [value, setValue] = React.useState(0);
   const [user, setUser] = React.useState<Res_UserInfoLogin | undefined>();
   const [flag, setFlag] = React.useState(false);
+  const [myOrder, setMyOrder] = React.useState<Res_Orders[]>([]);
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -60,12 +65,19 @@ export default function Account() {
       .then((res) => {
         if (res) {
           setUser(res);
+          dispatch(loginSuccess(res));
         }
       })
       .catch((error) => {
         const newErr = error as Res_Error;
         toast.error(newErr.message, { autoClose: 1000 });
       });
+  }, [flag]);
+
+  React.useEffect(() => {
+    getData(_MY_ORDER).then((res) => {
+      if (res) setMyOrder(res);
+    });
   }, [flag]);
 
   return (
@@ -76,9 +88,8 @@ export default function Account() {
           flexGrow: 1,
           bgcolor: 'background.paper',
           display: 'flex',
-          height: '100vh',
+          minHeight: '100vh',
           width: '100vw',
-          paddingTop: '20px',
         }}
       >
         <ToastContainer />
@@ -95,9 +106,10 @@ export default function Account() {
               <Tab label="Info User" {...a11yProps(0)} />
               <Tab label="Change Password" {...a11yProps(1)} />
               <Tab label="Avatar" {...a11yProps(2)} />
+              <Tab label="MyOrder" {...a11yProps(2)} />
             </Tabs>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={9}>
             <TabPanel value={value} index={0}>
               <UpdateInfoUser user={user} setFlag={setFlag} flag={flag} />
             </TabPanel>
@@ -106,6 +118,9 @@ export default function Account() {
             </TabPanel>
             <TabPanel value={value} index={2}>
               <UpdateAvatar flag={flag} setFlag={setFlag} />
+            </TabPanel>
+            <TabPanel value={value} index={3}>
+              <MyOrder myOrder={myOrder} />
             </TabPanel>
           </Grid>
         </Grid>

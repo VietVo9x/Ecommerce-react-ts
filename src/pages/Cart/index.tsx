@@ -22,6 +22,7 @@ import { Res_CartItem } from '../../types/response.type';
 import { calculateTotalQuantity, formatCurrency, totalPriceCart } from '../../utils/constant';
 import { setTotalCart } from '../../redux/slice/cart.slice';
 import { displayError } from '../../utils/display-error';
+import CartEmpty from '../../components/CartEmpty';
 
 export default function Cart() {
   const [cart, setCart] = useState<Res_CartItem[]>([]);
@@ -201,12 +202,7 @@ export default function Cart() {
           </div>
         </>
       ) : (
-        <section className="cart--empty">
-          <h1>Your cart is empty</h1>
-          <Button variant="contained" color="secondary">
-            <Link to="/products">Back products page</Link>
-          </Button>
-        </section>
+        <CartEmpty title="Your Cart Empty" />
       )}
     </div>
   );

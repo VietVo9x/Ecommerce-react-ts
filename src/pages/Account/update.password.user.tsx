@@ -13,6 +13,7 @@ import { RootState } from '../../redux/store/configureStore';
 export default function UpdatePasswordUser() {
   const accountSerview = new AccountService();
   const user = useSelector((state: RootState) => state.auth.user);
+  const [isLoading, setIsLoading] = useState(false);
   const [updatePassword, setUpdatePassword] = useState<Req_UpdatePassword>({
     oldPassword: '',
     newPassword: '',
@@ -31,10 +32,12 @@ export default function UpdatePasswordUser() {
     setUpdatePassword({ ...updatePassword, [name]: value });
   };
   const handleSaveClick = async () => {
+    setIsLoading(true);
     try {
       const result = accountSerview.validateUpdatePassword(updatePassword);
       setErrors(result);
       if (result.isError) {
+        setIsLoading(false);
         return;
       }
       const updatePasswordEntity = {
@@ -43,13 +46,15 @@ export default function UpdatePasswordUser() {
       };
       if (user)
         await accountSerview.UpdatePassword(updatePasswordEntity, (user as Res_UserInfoLogin).id);
+      setIsLoading(false);
       displaySuccessMessage('update password successfully');
     } catch (error) {
+      setIsLoading(false);
       displayError(error);
     }
   };
   return (
-    <Box component={'form'}>
+    <Box component={'form'} maxWidth={'450px'}>
       <ToastContainer />
       <TextField
         id="outlined-basic"
@@ -91,7 +96,13 @@ export default function UpdatePasswordUser() {
         type="password"
       />
 
-      <Button fullWidth variant="contained" onClick={handleSaveClick} color="success">
+      <Button
+        fullWidth
+        variant="contained"
+        onClick={handleSaveClick}
+        color="success"
+        disabled={isLoading}
+      >
         Save
       </Button>
     </Box>

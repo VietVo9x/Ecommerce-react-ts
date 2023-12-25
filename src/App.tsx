@@ -29,7 +29,9 @@ function App() {
       try {
         setIsLoading(true);
         const res = await Auth();
-        setIsLoading(false);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1000);
         if (res) {
           dispatch(loginSuccess(res));
           const cart = await getCartQuantity();

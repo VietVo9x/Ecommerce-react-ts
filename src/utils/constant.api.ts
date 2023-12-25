@@ -13,7 +13,9 @@ const _COMMENT_BY_PRODUCT = '/reviews/by-product';
 const _CART = '/shopping-cart';
 const _CART_DELETE_ITEM = '/shopping-cart/cart-item/';
 const _CART_CLEAR_ALL = '/shopping-cart/clear-cart/';
+const _SHIPPING_ADDRESS = '/shipping-address';
 const _ORDER = '/orders';
+const _MY_ORDER = '/orders/my-order';
 export {
   _USER,
   _USER_REGISTER,
@@ -31,4 +33,6 @@ export {
   _PRODUCT_BY_ID,
   _COMMENT,
   _COMMENT_BY_PRODUCT,
+  _SHIPPING_ADDRESS,
+  _MY_ORDER,
 };
