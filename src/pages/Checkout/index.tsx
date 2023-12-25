@@ -21,7 +21,7 @@ import { Res_CartItem, Res_ShippingAddress } from '../../types/response.type';
 import './style.scss';
 import { getData } from '../../utils/api.services';
 import { _CART, _SHIPPING_ADDRESS } from '../../utils/constant.api';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store/configureStore';
 import { initialShippingAddress } from '../../utils/common/initial-state';
 import { displayError } from '../../utils/display-error';
@@ -33,9 +33,11 @@ import { error } from 'console';
 import { formatCurrency, totalPriceCart } from '../../utils/constant';
 import { ToastContainer } from 'react-toastify';
 import { displaySuccessMessage } from '../../utils/display-success';
+import { setTotalCart } from '../../redux/slice/cart.slice';
 
 export default function Checkout() {
   const user = useSelector((state: RootState) => state.auth.user);
+  const dispatch = useDispatch();
   const [cart, setCart] = useState<Res_CartItem[]>([]);
   const [shippingAddress, setShippingAddress] = useState<Res_ShippingAddress[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<number>();
@@ -78,6 +80,7 @@ export default function Checkout() {
         total_price: item.quantity * item.product.price,
       }));
       await checkoutService.createOrder(formAddress, shoppingCart);
+      dispatch(setTotalCart(0));
       setFlag(!flag);
       displaySuccessMessage('Order created successfully');
     } catch (error) {

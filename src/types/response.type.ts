@@ -72,6 +72,7 @@ export interface Res_ShippingAddress {
 export interface Res_Orders {
   id: number;
   userId: number;
+  user_name: string;
   status: false;
   all_price: number;
   createdAt: string;
