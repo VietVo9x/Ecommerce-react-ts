@@ -35,7 +35,7 @@ export default function Products() {
   const [count, setCount] = useState(0);
 
   const page = Number(searchParams.get('page')) || 1;
-  const params = React.useRef<{ [key: string]: any }>({ limit: 10 });
+  const params = React.useRef<{ [key: string]: any }>({ limit: 9 });
   React.useEffect(() => {
     searchParams.forEach((value, key) => {
       params.current[key] = value;

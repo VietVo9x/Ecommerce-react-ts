@@ -16,6 +16,7 @@ import PageHero from '../../components/PageHero';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../../redux/slice/auth.slice';
 import MyOrder from './my.order';
+import { displayError } from '../../utils/display-error';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -69,8 +70,7 @@ export default function Account() {
         }
       })
       .catch((error) => {
-        const newErr = error as Res_Error;
-        toast.error(newErr.message, { autoClose: 1000 });
+        displayError(error);
       });
   }, [flag]);
 

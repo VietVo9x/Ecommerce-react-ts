@@ -15,6 +15,7 @@ interface Props {
 }
 function Comment(props: Props) {
   const user = useSelector((state: RootState) => state.auth.user);
+  const isLogin = useSelector((state: RootState) => state.auth.isLogin);
   const [comment, setComment] = useState('');
   const [rating, setRating] = useState(0);
   const [error, setError] = useState({
@@ -31,8 +32,8 @@ function Comment(props: Props) {
   };
 
   const handleSubmit = async () => {
-    if (!user) {
-      displayError({ message: 'Please log in to comment' });
+    if (!user || !isLogin) {
+      displayError({ message: 'Please login in to comment' });
       return;
     }
     try {

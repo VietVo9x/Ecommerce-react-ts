@@ -1,6 +1,6 @@
 import { Res_CartItem } from '../types/response.type';
 
-export const perPage = 6;
+export const perPage = 9;
 
 //tong so cart
 export const calculateTotalQuantity = (cartData: Res_CartItem[]): number => {

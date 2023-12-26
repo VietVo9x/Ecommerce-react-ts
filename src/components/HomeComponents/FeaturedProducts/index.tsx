@@ -28,7 +28,7 @@ export default function FeaturedProducts() {
   }, []);
 
   return (
-    <Box sx={{ flexGrow: 1 }} mb={5}>
+    <Box sx={{ flexGrow: 1 }} mb={5} p={2}>
       <Typography gutterBottom variant="h3" component={'h5'} textAlign={'center'} mb={5}>
         New Product
       </Typography>

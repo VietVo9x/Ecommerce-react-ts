@@ -32,6 +32,7 @@ export default function SingleProduct() {
   const [reload, setReload] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const user = useSelector((state: RootState) => state.auth.user);
+  const isLogin = useSelector((state: RootState) => state.auth.isLogin);
   const { id } = useParams();
   const dispatch = useDispatch();
   useEffect(() => {
@@ -70,6 +71,10 @@ export default function SingleProduct() {
     }
   };
   const handleAddToCart = async () => {
+    if (!isLogin) {
+      displayError({ message: 'Please login add to cart' });
+      return;
+    }
     try {
       const cart = {
         productId: product.id,
@@ -92,6 +97,7 @@ export default function SingleProduct() {
     const avenrageRating = totalRating / comments.length;
     return avenrageRating;
   };
+  const ratingValue = calAverageRating();
 
   return (
     <div>
@@ -129,7 +135,11 @@ export default function SingleProduct() {
                 </Typography>
                 <div className="product__content--rating">
                   <span>
-                    <Rating name="read-only" value={calAverageRating()} readOnly />
+                    {ratingValue === 0 ? (
+                      <Rating name="read-only" value={5} readOnly />
+                    ) : (
+                      <Rating name="read-only" value={ratingValue} readOnly />
+                    )}
                   </span>
                   <span>({comments.length} customer reviews)</span>
                 </div>
